@@ -12,8 +12,19 @@ angular.module("about/about.tpl.html", []).run(["$templateCache", function($temp
 angular.module("list/list.tpl.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("list/list.tpl.html",
     "<div class=\"container\" ng-click=\"hideMenu()\">\n" +
-    "  <div class=\"clear-70\"></div>\n" +
-    "  <div class=\"col-md-12\">\n" +
+    "  <div class=\"col-md-12\" ng-show=\"listLocation === false\">\n" +
+    "    <div class=\"clear-70\"></div>\n" +
+    "    <h1>Please provide a location for your data store:</h1>\n" +
+    "    <div class=\"prepare-list\">\n" +
+    "      <form name=\"preList\">\n" +
+    "        <div class=\"btn-group half-width\">\n" +
+    "          <input type=\"text\" ng-model=\"uriPath\" name=\"uriPath\" id=\"uriPath\" class=\"nginput pull-left\" placeholder=\"https://example.org/\" autofocus />\n" +
+    "          <button class=\"btn btn-primary\" ng-click=\"prepareList(uriPath)\"><i class=\"fa fa-search fa-2x\"></i></button>\n" +
+    "        </div>\n" +
+    "      </form>\n" +
+    "    </div>\n" +
+    "  </div>\n" +
+    "  <div ng-cloak class=\"col-md-12\" ng-show=\"listLocation === true\">\n" +
     "    <table class=\"create-new\">\n" +
     "      <tr>\n" +
     "        <td>\n" +
@@ -29,18 +40,15 @@ angular.module("list/list.tpl.html", []).run(["$templateCache", function($templa
     "        <td>\n" +
     "          <div id=\"crumbs\" class=\"collapse navbar-collapse\">\n" +
     "            <ul>\n" +
-    "              <li ng-repeat=\"dir in dirPath\">\n" +
-    "                <a href=\"{{dir.uri}}\"><i class=\"fa\" ng-class=\"$index==0?'fa-home':'fa-folder-open-o'\"></i> {{dir.name}}</a>\n" +
+    "              <li ng-repeat=\"crumb in breadCrumbs\">\n" +
+    "                <a href=\"{{crumb.uri}}\"><i class=\"fa\" ng-class=\"$first?'fa-home':'fa-folder-open-o'\"></i> {{crumb.name}}</a>\n" +
     "                </li>\n" +
     "      			</ul>\n" +
     "    	   	</div>\n" +
     "    		</td>\n" +
     "      </tr>\n" +
     "    </table>\n" +
-    "    <div class=\"alerts\" ng-show=\"alerts.length > 0\">\n" +
-    "      <alert ng-repeat=\"alert in alerts\" type=\"alert.type\" close=\"closeAlert($index)\">{{alert.msg}}</alert>\n" +
-    "    </div>\n" +
-    "    <div class=\"index\" ng-show=\"resources.length > 0\">\n" +
+    "    <div class=\"index\">\n" +
     "			<table class=\"box-shadow\">\n" +
     "				<thead>\n" +
     "					<th class=\"filename\">Name</th>\n" +
@@ -48,11 +56,11 @@ angular.module("list/list.tpl.html", []).run(["$templateCache", function($templa
     "					<th>Modified</th>\n" +
     "					<th class=\"right\">Actions</th>\n" +
     "				</thead>\n" +
-    "				<tr ng-repeat=\"res in resources\">\n" +
-    "					<td colspan=\"{{res.type=='Parent'?4:1}}\"><a href=\"{{res.path}}\"><i class=\"fa\" ng-class=\"res.type=='Directory'||res.type=='Parent'?'fa-folder-open-o':'fa-file-o'\"></i> {{res.name}}</a></td>\n" +
-    "					<td ng-hide=\"res.type=='Parent'\">{{res.size|fileSize}}</td>\n" +
-    "					<td ng-hide=\"res.type=='Parent'\"><div tooltip-placement=\"bottom\" tooltip=\"{{res.mtime|classicDate}}\">{{res.mtime|fromNow}}</div></td>\n" +
-    "					<td ng-hide=\"res.type=='Parent'\" class=\"right\">\n" +
+    "				<tr ng-repeat=\"res in resources|orderBy:['type','name']\" class=\"repeat-animation\">\n" +
+    "					<td colspan=\"{{res.type==='-'?4:1}}\"><a href=\"{{res.path}}\"><i class=\"fa\" ng-class=\"res.type=='Directory'||res.type==='-'?'fa-folder-open-o':'fa-file-o'\"></i> {{res.name}}</a></td>\n" +
+    "					<td ng-hide=\"res.type==='-'\">{{res.size|fileSize}}</td>\n" +
+    "					<td ng-hide=\"res.type==='-'\"><div tooltip-placement=\"bottom\" tooltip=\"{{res.mtime|classicDate}}\">{{res.mtime|fromNow}}</div></td>\n" +
+    "					<td ng-hide=\"res.type==='-'\" class=\"right\">\n" +
     "						<div class=\"btn-group\" dropdown is-open=\"status.isopen\">\n" +
     "              <button type=\"button\" class=\"btn btn-primary dropdown-toggle\" ng-disabled=\"disabled\">\n" +
     "                Action <span class=\"caret\"></span>\n" +
@@ -169,8 +177,8 @@ angular.module("login/login.tpl.html", []).run(["$templateCache", function($temp
     "    <div class=\"panel-body\">\n" +
     "        <h2>Welcome to LDP File Manager!</h2>\n" +
     "        <div ng-hide=\"loginSuccess\">\n" +
-    "          <h3>You must be authenticated in order to use this application.</h3>\n" +
-    "          <p ng-hide=\"showLogin\"><button class=\"btn btn-primary btn-sep-right\" ng-click=\"showLogin=!showLogin\">Login / Sign Up</button></p>\n" +
+    "          <h3>Please authenticated in order for us to find your files.</h3>\n" +
+    "          <p ng-hide=\"showLogin\"><button class=\"btn btn-primary btn-sep-right\" ng-click=\"showLogin=!showLogin\">Login</button></p>\n" +
     "        </div>\n" +
     "  </div>\n" +
     "\n" +

@@ -5,17 +5,18 @@
 
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <!-- font awesome from BootstrapCDN -->
-    <link href="http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+    <!-- font awesome -->
+    <!-- <link href="assets/css/font-awesome.css" rel="stylesheet"> -->
 
     <!-- compiled CSS -->
-    <link rel="stylesheet" type="text/css" href="assets/Warp-1.0.0.css" />
+    <link rel="stylesheet" type="text/css" href="assets/App-1.1.0.css" />
 
     <!-- favicon -->
-    <link rel="shortcut icon" type="img/png" href="assets/favicon.png">
+    <link rel="shortcut icon" type="img/png" href="assets/favicon.ico">
 
     <!-- compiled JavaScript -->
     <script type="text/javascript" src="vendor/angular/angular.js"></script>
+    <script type="text/javascript" src="vendor/angular/angular-animate.js"></script>
     <script type="text/javascript" src="vendor/angular-bootstrap/ui-bootstrap-tpls.min.js"></script>
     <script type="text/javascript" src="vendor/angular-bootstrap/ui-bootstrap.min.js"></script>
     <script type="text/javascript" src="vendor/placeholders/angular-placeholders-0.0.1-SNAPSHOT.min.js"></script>
@@ -34,9 +35,9 @@
     <script type="text/javascript" src="templates-common.js"></script>
     <script type="text/javascript" src="templates-app.js"></script>
   </head>
-  <body flow-prevent-drop>
+  <body flow-prevent-drop ng-cloak>
       <div class="topbar box-shadow">
-        <div class="logo" tooltip-placement="left" tooltip="Warp - the file manager"><i class="fa fa-rocket fa-3x"></i></div>
+        <div class="pull-right white"><h1><i class="fa fa-rocket orange"></i> WARP</h1></div>
       </div>
 
     <div ng-class="showMenu?'slide-out':''" class="sidebar left-menu">
@@ -59,7 +60,7 @@
           <a href ui-sref="home">
             <div>
               <i class="fa fa-th-list fa-3x"></i>
-              <p>Files</p>
+              <p>List files</p>
             </div>
           </a>
           <i class="fa fa-ellipsis-h fa-2x light-grey"></i>
@@ -75,11 +76,11 @@
           <i class="fa fa-ellipsis-h fa-2x light-grey"></i>
         </div>
         -->
-        <div class="menu-item" tooltip-placement="bottom" tooltip="Enable notifications" ng-hide="notifStatus=='granted'">
+        <div class="menu-item" tooltip-placement="bottom" tooltip="{{notifEnabledTxt}}" ng-hide="checkNotif() === 'granted'">
           <a href ng-click="authorizeNotifications()">
             <div>
-              <i class="fa fa-bullhorn fa-3x"></i>
-              <p>Enable notifications</p>
+              <i class="fa fa-bullhorn fa-3x" ng-class="notifStatus=='granted'?'orange':''"></i>
+              <p>Notifications</p>
             </div>
           </a>
           <i class="fa fa-ellipsis-h fa-2x light-grey"></i>
@@ -111,9 +112,7 @@
       <div class="container">
         <div class="footer-inner">
           <p>
-            &copy; 2014 <i class="fa fa-rocket"></i> Warp - the file manager | 
-            <i class="fa fa-github-alt"></i> <a href="https://github.com/deiu/warp" target="_blank">Source</a> | 
-            <i class="fa fa-github-alt"></i> <a href="https://github.com/deiu/warp/issues" target="_blank">Issues</a>
+            &copy; 2014 Warp | <a href="https://github.com/linkeddata/warp"><i class="fa fa-github"></i> Source</a> | <a href="https://github.com/linkeddata/warp/issues"><i class="fa fa-bug"></i> Issues</a>
           </p>
         </div>
       </div>

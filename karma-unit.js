@@ -10,6 +10,7 @@ module.exports = function ( karma ) {
      */
     files: [
       'vendor/angular/angular.js',
+      'vendor/angular/angular-animate.js',
       'vendor/angular-bootstrap/ui-bootstrap-tpls.min.js',
       'vendor/angular-bootstrap/ui-bootstrap.min.js',
       'vendor/placeholders/angular-placeholders-0.0.1-SNAPSHOT.min.js',

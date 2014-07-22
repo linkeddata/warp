@@ -15,18 +15,16 @@ angular.module( 'App', [
 ])
 
 .config( function AppConfig ( $stateProvider, $urlRouterProvider ) {
-  $urlRouterProvider.otherwise( '/login' );
+  $urlRouterProvider.otherwise( '/list/' );
 })
 
 .run( function run () {
 })
 
 .controller( 'MainCtrl', function MainCtrl ( $scope, $location, $timeout, ngProgress ) {
-  // progress bar styling
-  ngProgress.height('5px');
-  ngProgress.color('#FF3C1F');
-
   // Some default values
+  ngProgress.height('5px');
+  ngProgress.color('#ff3c1f');
   $scope.appuri = window.location.hostname+window.location.pathname;
   $scope.userProfile = {};
   $scope.userProfile.picture = 'assets/generic_photo.png';
@@ -63,7 +61,7 @@ angular.module( 'App', [
 
   $scope.$on('$stateChangeSuccess', function(event, toState, toParams, fromState, fromParams){
     if ( angular.isDefined( toState.data.pageTitle ) ) {
-      $scope.pageTitle = toState.data.pageTitle + ' | App Name' ;
+      $scope.pageTitle = 'Warp | ' + toState.data.pageTitle;
     }
   });
 
@@ -82,6 +80,10 @@ angular.module( 'App', [
       sessionStorage.removeItem($scope.appuri);
     }
   }
+
+  $scope.checkNotif = function() {
+    return getNotifStatus();
+  };
 
   $scope.authorizeNotifications = function() {
     authorizeNotifications();

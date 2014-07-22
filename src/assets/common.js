@@ -2,8 +2,11 @@ var isInteger = function(a) {
     return ((typeof a !== 'number') || (a % 1 !== 0)) ? false : true;
 };
 
-stripSchema = function (uri) {
-    return uri.slice(uri.indexOf('://')+3, uri.length);
+stripSchema = function (url) {
+    url = url.split('://');
+    var schema = (url[0].substring(0, 4) == 'http')?url[0]:'';
+    var path = (url[1].length > 0)?url[1]:url[0];
+    return url[0]+'/'+url[1];
 };
 
 humanFileSize = function (bytes, si) {
