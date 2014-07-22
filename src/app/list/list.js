@@ -216,14 +216,15 @@ angular.module( 'App.list', [
   };
 
   $scope.newDir = function(dirName) {
+    // trim whitespaces
+    dirName = dirName.replace(/^\s+|\s+$/g, "");
     $http({
-      method: 'POST', 
-      url: $scope.path,
+      method: 'PUT', 
+      url: $scope.path+dirName,
       data: '',
       headers: {
         'Content-Type': 'text/turtle',
-        'Link': '<http://www.w3.org/ns/ldp#BasicContainer>; rel="type"',
-        'Slug': dirName
+        'Link': '<http://www.w3.org/ns/ldp#BasicContainer>; rel="type"' 
       },
       withCredentials: true
     }).
@@ -257,6 +258,8 @@ angular.module( 'App.list', [
   };
 
   $scope.newFile = function(fileName) {
+    // trim whitespaces
+    fileName = fileName.replace(/^\s+|\s+$/g, "");
     $http({
       method: 'PUT', 
       url: $scope.path+fileName,
