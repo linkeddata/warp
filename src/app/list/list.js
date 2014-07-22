@@ -179,9 +179,10 @@ angular.module( 'App.list', [
             size: '-'
           };
         } else {
+          var base = (document.location.href.charAt(document.location.href.length - 1) === '/')?document.location.href:document.location.href+'/';
           d = {
             uri: dirs[i].subject.uri,
-            path: document.location.href+basename(dirs[i].subject.uri)+'/',
+            path: base+basename(dirs[i].subject.uri)+'/',
             type: 'Directory',
             name: basename(dirs[i].subject.value),
             mtime: g.any(dirs[i].subject, POSIX("mtime")).value,
@@ -231,9 +232,10 @@ angular.module( 'App.list', [
         notify('Success', 'Directory created.');
         // add dir to local list
         var now = new Date().getTime();
+        var base = (document.location.href.charAt(document.location.href.length - 1) === '/')?document.location.href:document.location.href+'/';
         var d = {
             uri: $scope.path+dirName,
-            path: document.location.href+basename($scope.path+dirName)+'/',
+            path: base+basename($scope.path+dirName)+'/',
             type: 'Directory',
             name: dirName,
             mtime: now,
