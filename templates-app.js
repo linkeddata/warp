@@ -14,7 +14,7 @@ angular.module("list/list.tpl.html", []).run(["$templateCache", function($templa
     "<div class=\"container\" ng-click=\"hideMenu()\">\n" +
     "  <div class=\"col-md-12\" ng-show=\"listLocation === false\">\n" +
     "    <div class=\"clear-70\"></div>\n" +
-    "    <h1>Please provide a location for your data store:</h1>\n" +
+    "    <h1>Please provide a location for the data server:</h1>\n" +
     "    <div class=\"prepare-list\">\n" +
     "      <form name=\"preList\">\n" +
     "        <div class=\"btn-group half-width\">\n" +

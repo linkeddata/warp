@@ -47,35 +47,35 @@
           <span class="icon-bar"></span>
       </button>
 
-      <div ng-show="userProfile.webid" ng-click="showMenu=false">
-        <div class="menu-item avatar-frame">
+      <div ng-click="showMenu=false">
+        <div ng-show="userProfile.webid" class="menu-item avatar-frame">
           <a href="{{userProfile.webid}}" target="_blank" ui-sref="profile">
             <img ng-src="{{userProfile.picture}}" class="profile-img" title="{{userProfile.name}}" alt="{{userProfile.name}}" />
           </a>
         </div>
 
-        <i class="fa fa-ellipsis-h fa-2x light-grey"></i>
+        <i ng-show="userProfile.webid" class="fa fa-ellipsis-h fa-2x light-grey"></i>
         
-        <div class="menu-item">
-          <a href ui-sref="home">
+        <div ng-show="userProfile.webid" class="menu-item">
+          <a href ng-click="myList()">
             <div>
               <i class="fa fa-th-list fa-3x"></i>
-              <p>List files</p>
+              <p>My files</p>
             </div>
           </a>
           <i class="fa fa-ellipsis-h fa-2x light-grey"></i>
         </div>
-        <!--
+        
         <div class="menu-item">
-          <a href ui-sref="settings">
+          <a href="#/list/">
             <div class="settings">
-              <i class="fa fa-cogs fa-3x"></i>
-              <p>Settings</p>
+              <i class="fa fa-search fa-3x"></i>
+              <p>Lookup</p>
             </div>
           </a>
           <i class="fa fa-ellipsis-h fa-2x light-grey"></i>
         </div>
-        -->
+        
         <div class="menu-item" tooltip-placement="bottom" tooltip="{{notifEnabledTxt}}" ng-hide="checkNotif() === 'granted'">
           <a href ng-click="authorizeNotifications()">
             <div>
@@ -86,7 +86,7 @@
           <i class="fa fa-ellipsis-h fa-2x light-grey"></i>
         </div>
 
-        <div class="">
+        <div ng-show="userProfile.webid" class="">
           <a href ng-click="logout()">
             <div class="logout menu-item">
               <i class="fa fa-power-off fa-3x orange"></i>

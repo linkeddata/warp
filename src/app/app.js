@@ -54,6 +54,12 @@ angular.module( 'App', [
     $location.path('/list');
   };
 
+  $scope.myList = function() {
+    if ($scope.userProfile.storagespace && $scope.userProfile.storagespace.length > 0) {
+      $location.path('/list/'+stripSchema($scope.userProfile.storagespace));
+    }
+  };
+
   // clear sessionStorage
   $scope.clearLocalCredentials = function () {
     sessionStorage.removeItem($scope.appuri);

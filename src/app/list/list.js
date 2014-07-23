@@ -94,10 +94,6 @@ angular.module( 'App.list', [
   $scope.emptyDir = false;
   $scope.breadCrumbs = [];
 
-  // var storage = $scope.$parent.userProfile.storagespace;
-  // $scope.schema = (storage !== undefined)?storage.slice(0, storage.indexOf('://')):$location.$$protocol;
-  // $scope.path = $stateParams.path;
-
   $scope.prepareList = function(url) {
     if (url && url.length > 0) {
       $scope.listLocation = true;
@@ -194,7 +190,6 @@ angular.module( 'App.list', [
       // TODO: remove duplicates using http://lodash.com/docs#union
       var files = g.statementsMatching(undefined, RDF("type"), POSIX("File"));
       files = (files.length > 0)?files.concat(g.statementsMatching(undefined, RDF("type"), RDFS("Resource"))):g.statementsMatching(undefined, RDF("type"), RDFS("Resource"));
-      console.log(files);
       for (i in files) {
         var f = {
           uri: files[i].subject.uri,
@@ -247,7 +242,6 @@ angular.module( 'App.list', [
             mtime: now,
             size: '-'
           };
-        console.log(d);
         $scope.resources.push(d);
         $scope.emptyDir = false;
       }
@@ -281,7 +275,6 @@ angular.module( 'App.list', [
         notify('Success', 'Resource created.');
         // Add resource to the list
         var res = headers('Location');
-        console.log(headers());
         var f = {
           uri: res,
           path: '#/view/'+stripSchema(res),
