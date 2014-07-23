@@ -91,6 +91,7 @@ angular.module( 'App.list', [
   $scope.schema = '';
   $scope.resources = [];
   $scope.listLocation = true;
+  $scope.emptyDir = false;
   $scope.breadCrumbs = [];
 
   // var storage = $scope.$parent.userProfile.storagespace;
@@ -109,7 +110,6 @@ angular.module( 'App.list', [
 
   // TODO: rdflib fetch does not respond properly to 404
   $scope.listDir = function (url) {
-    console.log("Requested path: "+url); // debug
     var elms = url.split("/");
     var schema = '';
     var path = '';
@@ -120,7 +120,6 @@ angular.module( 'App.list', [
       schema = 'https';
     }
     $scope.path = schema+'://';
-    console.log("So far: "+$scope.path);
 
     for (i=0; i<elms.length; i++) {
       if (elms[i].length > 0) {
@@ -191,7 +190,11 @@ angular.module( 'App.list', [
         }
         $scope.resources.push(d);
       }
-      var files = g.statementsMatching(undefined, RDF("type"), RDFS("Resource"));
+      // either POSIX:File or RDFS:Resource
+      // TODO: remove duplicates using http://lodash.com/docs#union
+      var files = g.statementsMatching(undefined, RDF("type"), POSIX("File"));
+      files = (files.length > 0)?files.concat(g.statementsMatching(undefined, RDF("type"), RDFS("Resource"))):g.statementsMatching(undefined, RDF("type"), RDFS("Resource"));
+      console.log(files);
       for (i in files) {
         var f = {
           uri: files[i].subject.uri,
@@ -204,7 +207,9 @@ angular.module( 'App.list', [
         $scope.resources.push(f);
         $scope.$apply();
       }
-      console.log($scope.resources);
+      if ($scope.resources.length === 0) {
+        $scope.emptyDir = true;
+      }
       ngProgress.complete();
       $scope.$apply();
     });
@@ -244,15 +249,16 @@ angular.module( 'App.list', [
           };
         console.log(d);
         $scope.resources.push(d);
+        $scope.emptyDir = false;
       }
     }).
     error(function(data, status) {
       if (status == 401) {
-        notify('Forbidden', 'Authentication required to create new directory.');
+        notify('Forbidden', 'Authentication required to create new directory.', 5000);
       } else if (status == 403) {
-        notify('Forbidden', 'Insufficient permissions to create new directory.');
+        notify('Forbidden', 'Insufficient permissions to create new directory.', 5000);
       } else {
-        notify('Failed'+status, data);
+        notify('Failed'+status, data, 5000);
       }
     });
   };
@@ -275,6 +281,7 @@ angular.module( 'App.list', [
         notify('Success', 'Resource created.');
         // Add resource to the list
         var res = headers('Location');
+        console.log(headers());
         var f = {
           uri: res,
           path: '#/view/'+stripSchema(res),
@@ -286,16 +293,16 @@ angular.module( 'App.list', [
         // TODO Refresh the view
         $scope.resources.push(f);
         // Add
-
+        $scope.emptyDir = false;
       }
     }).
     error(function(data, status) {
       if (status == 401) {
-        notify('Forbidden', 'Authentication required to create new resource.');
+        notify('Forbidden', 'Authentication required to create new resource.', 5000);
       } else if (status == 403) {
-        notify('Forbidden', 'Insufficient permissions to create new resource.');
+        notify('Forbidden', 'Insufficient permissions to create new resource.', 5000);
       } else {
-        notify('Failed'+status, data);
+        notify('Failed'+status, data, 5000);
       }
     });
   };
@@ -312,19 +319,19 @@ angular.module( 'App.list', [
     }).
     success(function(data, status) {
       if (status == 200 || status == 201) {
-        notify('Success', basename(resourceUri)+' was deleted.');
+        notify('Success', 'Deleted '+basename(resourceUri)+'.');
         $scope.removeResource(resourceUri);
       }
     }).
     error(function(data, status) {
       if (status == 401) {
-        notify('Forbidden', 'Authentication required to delete resource.');
+        notify('Forbidden', 'Authentication required to delete resource.', 5000);
       } else if (status == 403) {
-        notify('Forbidden', 'Insufficient permissions to delete resource.');
+        notify('Forbidden', 'Insufficient permissions to delete resource.', 5000);
       } else if (status == 409) {
-        notify('Failed', 'Conflict detected. In case of directory, check if not empty.');
+        notify('Failed', 'Conflict detected. In case of directory, check if not empty.', 5000);
       } else {
-        notify('Failed'+status, data);
+        notify('Failed'+status, data, 5000);
       }
     });
   };
@@ -332,8 +339,11 @@ angular.module( 'App.list', [
   $scope.removeResource = function(uri) {
     if ($scope.resources) {
       for(var i = $scope.resources.length - 1; i >= 0; i--){
-        if($scope.resources[i].uri == uri){
-            $scope.resources.splice(i,1);
+        if($scope.resources[i].uri == uri) {
+          $scope.resources.splice(i,1);
+          if ($scope.resources.length === 0) {
+            $scope.emptyDir = true;
+          }
         }
       }
     }
@@ -359,7 +369,6 @@ angular.module( 'App.list', [
   };
   // Remove resource dialog
   $scope.openDelete = function (uri) {
-    console.log("Calling openDelete for "+uri);
     var modalInstance = $modal.open({
       templateUrl: 'delete.html',
       controller: ModalDeleteCtrl,

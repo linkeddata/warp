@@ -51,7 +51,7 @@ angular.module( 'App', [
     // clear sessionStorage
     $scope.clearLocalCredentials();
     $scope.userProfile = {};
-    $location.path('/login');
+    $location.path('/list');
   };
 
   // clear sessionStorage

@@ -56,6 +56,9 @@ angular.module("list/list.tpl.html", []).run(["$templateCache", function($templa
     "					<th>Modified</th>\n" +
     "					<th class=\"right\">Actions</th>\n" +
     "				</thead>\n" +
+    "        <tr ng-show=\"emptyDir\">\n" +
+    "          <td colspan=\"4\"><h2>No files found</h2></td>\n" +
+    "        </tr>\n" +
     "				<tr ng-repeat=\"res in resources|orderBy:['type','name']\" class=\"repeat-animation\">\n" +
     "					<td colspan=\"{{res.type==='-'?4:1}}\"><a href=\"{{res.path}}\"><i class=\"fa\" ng-class=\"res.type=='Directory'||res.type==='-'?'fa-folder-open-o':'fa-file-o'\"></i> {{res.name}}</a></td>\n" +
     "					<td ng-hide=\"res.type==='-'\">{{res.size|fileSize}}</td>\n" +
@@ -102,7 +105,7 @@ angular.module("list/list.tpl.html", []).run(["$templateCache", function($templa
     "  <script type=\"text/ng-template\" id=\"newfile.html\">\n" +
     "    <div>\n" +
     "      <div class=\"modal-header\">\n" +
-    "            <h3 class=\"modal-title\">New directory</h3>\n" +
+    "            <h3 class=\"modal-title\">New file</h3>\n" +
     "        </div>\n" +
     "        <div class=\"modal-body\">\n" +
     "          <form name=\"newFileName\">\n" +
