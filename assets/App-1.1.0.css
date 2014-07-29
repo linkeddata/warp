@@ -1426,7 +1426,7 @@ caption {
   min-width: 300px;
   min-height: 300px;
 }
-.upload-file {
+.upload-files {
   width: 100%;
 }
 .upload-files td {
@@ -7700,6 +7700,9 @@ h1 {
 }
 .clear-70 {
   margin-top: 70px;
+}
+.progress {
+  margin-bottom: 0px!important;
 }
 [ng\:cloak],
 [ng-cloak],

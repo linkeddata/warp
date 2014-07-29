@@ -144,9 +144,9 @@ angular.module("list/list.tpl.html", []).run(["$templateCache", function($templa
     "            <td></td>\n" +
     "          </tr>\n" +
     "          <tr ng-repeat=\"file in selectedFiles\" ng-class=\"progress[file.name] == 100?'done':''\">\n" +
-    "            <td tooltip-placement=\"bottom\" tooltip=\"{{file.size|fileSize}}\">{{file.name|truncate:20}}</td>\n" +
-    "            <td>{{progress[file.name]}}%</td>\n" +
-    "            <td>\n" +
+    "            <td>{{file.name|truncate:30}}</td>\n" +
+    "            <td><progressbar value=\"progress[file.name]\"></progressbar></td>\n" +
+    "            <td class=\"pull-right\">\n" +
     "              <a ng-hide=\"progress[file.name] == 100\" class=\"btn btn-mini btn-default\" ng-click=\"abort(file.name)\"><i class=\"fa fa-2x fa-times\"></i></a>\n" +
     "              <a class=\"btn btn-mini btn-default\" ng-click=\"remove(file.name)\"><i class=\"fa fa-2x fa-trash-o\"></i></a>\n" +
     "            </td>\n" +
