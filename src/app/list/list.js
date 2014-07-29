@@ -402,7 +402,7 @@ var addResource = function (resources, uri, type, size) {
   var found = false;
   if (resources.length > 0) {
     for(var i = resources.length - 1; i >= 0; i--){
-      if(resources[i].uri == uri) {
+      if(decodeURIComponent(resources[i].uri) == decodeURIComponent(uri)) {
         resources[i] = f;
         found = true;
         break;
@@ -468,10 +468,31 @@ var ModalUploadCtrl = function ($scope, $modalInstance, $upload, url, resources)
   $scope.resources = resources;
   $scope.container = basename(url);
 
+  // stop/abort the upload of a file
+  $scope.abort = function(index) {
+    console.log($scope.uploading.length);
+    $scope.uploading[index].abort(); 
+  };
+
+  // remove file from upload list
+  $scope.remove = function(index) {
+    if ($scope.selectedFiles.length > 0) {
+      for (var i = $scope.selectedFiles.length - 1; i >= 0; i--) {
+        if(decodeURIComponent($scope.selectedFiles[i].name) == decodeURIComponent(index)) {
+          $scope.selectedFiles.splice(i, 1);
+          $scope.uploading[index].abort();
+          $scope.uploading[index] = null;
+          break;
+        }
+      }
+    }
+  };
+
+  // TODO: handle errors during upload
   $scope.doUpload = function(file) {
     $scope.progress[file.name] = 0;
     file.name = file.name.replace(/^\s+|\s+$/g, "");
-    $upload.upload({
+    $scope.uploading[file.name] = $upload.upload({
         url: $scope.url+encodeURIComponent(file.name),
         method: 'PUT',
         withCredentials: true,
@@ -483,18 +504,16 @@ var ModalUploadCtrl = function ($scope, $modalInstance, $upload, url, resources)
         // file is uploaded successfully
         addResource($scope.resources, $scope.url+encodeURIComponent(file.name), 'File', file.size);
         console.log(data);
-      // }).error(function(data, status, headers) {
-      //   console.log('Error uploading '+file.name+"! Status: "+status + "Error: "+data);
-      });
+    });
   };
 
   $scope.onFileSelect = function($files) {
-    //$files: an array of files selected, each file has name, size, and type.
     $scope.selectedFiles = $files;
-    $scope.progress = []; 
+    $scope.progress = [];
+    $scope.uploading = [];
     for (var i = 0; i < $files.length; i++) {
       var file = $files[i];
-      $scope.upload = $scope.doUpload(file);
+      $scope.doUpload(file);
       //.error(...)
       //.then(success, error, progress); 
       // access or attach event listeners to the underlying XMLHttpRequest.

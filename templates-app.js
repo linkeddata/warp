@@ -130,28 +130,30 @@ angular.module("list/list.tpl.html", []).run(["$templateCache", function($templa
     "        <h3 class=\"modal-title\">Upload files to <strong>{{container}}/</strong></h3>\n" +
     "      </div>\n" +
     "      <div class=\"modal-body\">\n" +
-    "        <input type=\"file\" ng-file-select=\"onFileSelect($files)\" multiple>\n" +
+    "        <input type=\"file\" ng-file-select=\"onFileSelect($files)\" data-multiple=\"true\" multiple=\"multiple\">\n" +
     "        <div ng-file-drop=\"onFileSelect($files)\" ng-file-drag-over-class=\"'dropzone-on'\" class=\"dropzone\" ng-show=\"dropSupported\">\n" +
     "          drop files here\n" +
     "        </div>\n" +
     "        <div ng-file-drop-available=\"dropSupported=true\" ng-show=\"!dropSupported\">\n" +
     "          HTML5 Drop File is not supported!\n" +
     "        </div>\n" +
-    "        <table class=\"upload-files\" ng-show=\"selectedFiles\">\n" +
+    "        <table class=\"upload-files\" ng-show=\"selectedFiles.length > 0\">\n" +
     "          <tr>\n" +
     "            <td><strong>File name</strong></td>\n" +
     "            <td><strong>Status</strong></td>\n" +
-    "            <td><strong>Actions</strong></td>\n" +
+    "            <td></td>\n" +
     "          </tr>\n" +
-    "          <tr ng-repeat=\"file in selectedFiles\">\n" +
+    "          <tr ng-repeat=\"file in selectedFiles\" ng-class=\"progress[file.name] == 100?'done':''\">\n" +
     "            <td tooltip-placement=\"bottom\" tooltip=\"{{file.size|fileSize}}\">{{file.name|truncate:20}}</td>\n" +
     "            <td>{{progress[file.name]}}%</td>\n" +
-    "            <td></td>\n" +
+    "            <td>\n" +
+    "              <a ng-hide=\"progress[file.name] == 100\" class=\"btn btn-mini btn-default\" ng-click=\"abort(file.name)\"><i class=\"fa fa-2x fa-times\"></i></a>\n" +
+    "              <a class=\"btn btn-mini btn-default\" ng-click=\"remove(file.name)\"><i class=\"fa fa-2x fa-trash-o\"></i></a>\n" +
+    "            </td>\n" +
     "          </tr>\n" +
     "        </table>\n" +
     "      </div>\n" +
     "      <div class=\"modal-footer\">\n" +
-    "        <a class=\"btn btn-default\" ng-click=\"$upload.abort()\">Cancel Upload</a>\n" +
     "        <a class=\"btn btn-default\" ng-click=\"cancel()\">Close</a>\n" +
     "      </div>\n" +
     "    </div>\n" +
