@@ -33,7 +33,7 @@ angular.module("list/list.tpl.html", []).run(["$templateCache", function($templa
     "            <ul class=\"dropdown-menu\" role=\"menu\">\n" +
     "              <li><a href ng-click=\"openNewDir()\"><i class=\"fa fa-2x fa-folder-open-o fa-fw vmiddle\"></i> Directory</a></li>\n" +
     "              <li><a href ng-click=\"openNewFile()\"><i class=\"fa fa-2x fa-file-o fa-fw vmiddle\"></i> File</a></li>\n" +
-    "              <li><a href ng-click=\"openNewUpload()\"><i class=\"fa fa-2x fa-cloud-upload fa-fw vmiddle\"></i> Upload</a></li>\n" +
+    "              <li><a href ng-click=\"openNewUpload(path)\"><i class=\"fa fa-2x fa-cloud-upload fa-fw vmiddle\"></i> Upload</a></li>\n" +
     "            </ul>\n" +
     "          </div>\n" +
     "    		</td>\n" +
@@ -54,7 +54,7 @@ angular.module("list/list.tpl.html", []).run(["$templateCache", function($templa
     "					<th class=\"filename\">Name</th>\n" +
     "					<th>Size</th>\n" +
     "					<th>Modified</th>\n" +
-    "					<th class=\"right\">Actions</th>\n" +
+    "					<th class=\"right\">Action</th>\n" +
     "				</thead>\n" +
     "        <tr ng-show=\"emptyDir\">\n" +
     "          <td colspan=\"4\"><h2>No files found</h2></td>\n" +
@@ -63,10 +63,10 @@ angular.module("list/list.tpl.html", []).run(["$templateCache", function($templa
     "					<td colspan=\"{{res.type==='-'?4:1}}\"><a href=\"{{res.path}}\"><i class=\"fa\" ng-class=\"res.type=='Directory'||res.type==='-'?'fa-folder-open-o':'fa-file-o'\"></i> {{res.name}}</a></td>\n" +
     "					<td ng-hide=\"res.type==='-'\">{{res.size|fileSize}}</td>\n" +
     "					<td ng-hide=\"res.type==='-'\"><div tooltip-placement=\"bottom\" tooltip=\"{{res.mtime|classicDate}}\">{{res.mtime|fromNow}}</div></td>\n" +
-    "					<td ng-hide=\"res.type==='-'\" class=\"right\">\n" +
+    "					<td ng-hide=\"res.type==='-'\" class=\"center\">\n" +
     "						<div class=\"btn-group\" dropdown is-open=\"status.isopen\">\n" +
     "              <button type=\"button\" class=\"btn btn-primary dropdown-toggle\" ng-disabled=\"disabled\">\n" +
-    "                Action <span class=\"caret\"></span>\n" +
+    "                <i class=\"fa fa-angle-double-down\"></i>\n" +
     "              </button>\n" +
     "					      <ul class=\"dropdown-menu dropdown-menu-right left\" role=\"menu\">\n" +
     "					        <li><a href=\"#\" ng-show=\"res.type != 'Directory'\"><i class=\"fa fa-2x fa-pencil-square-o fa-fw vmiddle\"></i> View/Edit</a></li>\n" +
@@ -89,7 +89,7 @@ angular.module("list/list.tpl.html", []).run(["$templateCache", function($templa
     "        <div class=\"modal-body\">\n" +
     "          <form name=\"newDirName\">\n" +
     "            <fieldset>\n" +
-    "              <input type=\"text\" ng-model=\"dirName\" ng-pattern=\"/^[A-Za-z0-9_-]*$/\" name=\"dirName\" id=\"dirName\" class=\"nginput\" placeholder=\"dir name..\" autofocus />\n" +
+    "              <input type=\"text\" ng-model=\"dirName\" name=\"dirName\" id=\"dirName\" class=\"nginput\" placeholder=\"dir name..\" autofocus />\n" +
     "              <span ng-hide=\"newDirName.dirName.$valid\">Only use: a-z A-Z 0-9 _ -</span>\n" +
     "            </fieldset>\n" +
     "          </form>\n" +
@@ -124,29 +124,34 @@ angular.module("list/list.tpl.html", []).run(["$templateCache", function($templa
     "\n" +
     "  <!-- Upload file modal -->\n" +
     "  <script type=\"text/ng-template\" id=\"uploadfiles.html\">\n" +
-    "    <div flow-init=\"{target: $scope.path}\">\n" +
+    "    <div>\n" +
     "      <div class=\"modal-header\">\n" +
-    "          <h3 class=\"modal-title\">Upload a file</h3>\n" +
+    "        <h3 class=\"modal-title\">Upload files to <strong>{{container}}/</strong></h3>\n" +
     "      </div>\n" +
     "      <div class=\"modal-body\">\n" +
-    "          <input type=\"file\" class=\"btn btn-default\" flow-btn/>\n" +
-    "          \n" +
-    "          <div class=\"dragdrop\" flow-drop flow-drag-enter=\"style={border:'4px dotted #5cb85c'}\" flow-drag-leave=\"style={}\"\n" +
-    "         ng-style=\"style\">\n" +
-    "              Drag And Drop your files here\n" +
-    "          </div>\n" +
-    "          <table class=\"upload-files\">\n" +
-    "            <tr ng-repeat=\"file in $flow.files\">\n" +
-    "                <td>{{$index+1}}</td>\n" +
-    "                <td>{{file.name}}</td>\n" +
-    "                <td>{{file.msg}}</td>\n" +
-    "            </tr>\n" +
-    "          </table>\n" +
+    "        <input type=\"file\" ng-file-select=\"onFileSelect($files)\" multiple>\n" +
+    "        <div ng-file-drop=\"onFileSelect($files)\" ng-file-drag-over-class=\"'dropzone-on'\" class=\"dropzone\" ng-show=\"dropSupported\">\n" +
+    "          drop files here\n" +
     "        </div>\n" +
+    "        <div ng-file-drop-available=\"dropSupported=true\" ng-show=\"!dropSupported\">\n" +
+    "          HTML5 Drop File is not supported!\n" +
+    "        </div>\n" +
+    "        <table class=\"upload-files\" ng-show=\"selectedFiles\">\n" +
+    "          <tr>\n" +
+    "            <td><strong>File name</strong></td>\n" +
+    "            <td><strong>Status</strong></td>\n" +
+    "            <td><strong>Actions</strong></td>\n" +
+    "          </tr>\n" +
+    "          <tr ng-repeat=\"file in selectedFiles\">\n" +
+    "            <td tooltip-placement=\"bottom\" tooltip=\"{{file.size|fileSize}}\">{{file.name|truncate:20}}</td>\n" +
+    "            <td>{{progress[file.name]}}%</td>\n" +
+    "            <td></td>\n" +
+    "          </tr>\n" +
+    "        </table>\n" +
     "      </div>\n" +
     "      <div class=\"modal-footer\">\n" +
-    "        <!-- <span class=\"btn btn-primary\" ng-click=\"$scope.upload()\" ng-enabled=\"$index>1\">Upload File</span> -->\n" +
-    "        <span class=\"btn btn-default\" ng-click=\"cancel()\">Cancel</span>\n" +
+    "        <a class=\"btn btn-default\" ng-click=\"$upload.abort()\">Cancel Upload</a>\n" +
+    "        <a class=\"btn btn-default\" ng-click=\"cancel()\">Close</a>\n" +
     "      </div>\n" +
     "    </div>\n" +
     "  </script>\n" +

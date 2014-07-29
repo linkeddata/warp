@@ -9,7 +9,9 @@ module.exports = function ( karma ) {
      * This is the list of file patterns to load into the browser during testing.
      */
     files: [
+      'vendor/angular-file-upload/angular-file-upload-html5-shim.js',
       'vendor/angular/angular.js',
+      'vendor/angular-file-upload/angular-file-upload.js',
       'vendor/angular/angular-animate.js',
       'vendor/angular-bootstrap/ui-bootstrap-tpls.min.js',
       'vendor/angular-bootstrap/ui-bootstrap.min.js',

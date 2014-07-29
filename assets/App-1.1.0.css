@@ -1434,6 +1434,15 @@ caption {
   height: 100px;
   border: 4px dotted #ddd;
 }
+.dragdrop-err {
+  border-color: red;
+}
+.dragdrop-ok {
+  border-color: green;
+}
+.upload-file {
+  width: 100%;
+}
 .upload-files td {
   padding-right: 5px;
 }
@@ -1454,13 +1463,13 @@ caption {
   width: 70%;
 }
 .dropzone {
-  border: 2px dashed #bbb;
-  border-radius: 5px;
-  padding: 25px;
-  text-align: center;
-  font: 20pt bold;
-  color: #bbb;
-  margin-bottom: 20px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  border: 4px dotted #ddd;
+  padding: 20px;
+}
+.dropzone-on {
+  border-color: #5cb85c;
 }
 .actions {
   text-align: right;
@@ -7489,9 +7498,6 @@ h2 {
   margin-top: 10px;
   text-align: center;
 }
-.footer .footer-inner {
-  padding: 40px 0;
-}
 .footer .social {
   float: right;
   margin: 0;
@@ -7675,6 +7681,9 @@ h2 {
 }
 .dropdown-menu-right {
   right: 0 !important;
+}
+.btn-mini {
+  font-size: 10px;
 }
 /**
  * Overrides

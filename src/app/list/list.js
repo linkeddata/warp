@@ -19,9 +19,26 @@ angular.module( 'App.list', [
   'ngAnimate',
   'ui.bootstrap',
   'ui.bootstrap.tpls',
-  'flow'
+  'angularFileUpload'
 ])
 
+/**
+ * Each section or module of the site can also have its own routes. AngularJS
+ * will handle ensuring they are all available at run-time, but splitting it
+ * this way makes each module more "self-contained".
+ */
+.config(function ViewConfig( $stateProvider ) {
+  $stateProvider.state( 'list', {
+    url: '/list/{path:.*}',
+    views: {
+      "main": {
+        controller: 'ListCtrl',
+        templateUrl: 'list/list.tpl.html'
+      }
+    },
+    data:{ pageTitle: 'Listing resources' }
+  });
+})
 
 /**
  * Filters
@@ -47,37 +64,11 @@ angular.module( 'App.list', [
   };
 })
 
-/**
- * Each section or module of the site can also have its own routes. AngularJS
- * will handle ensuring they are all available at run-time, but splitting it
- * this way makes each module more "self-contained".
- */
-.config(function ViewConfig( $stateProvider ) {
-  $stateProvider.state( 'list', {
-    url: '/list/{path:.*}',
-    views: {
-      "main": {
-        controller: 'ListCtrl',
-        templateUrl: 'list/list.tpl.html'
-      }
-    },
-    data:{ pageTitle: 'Listing resources' }
-  });
-})
-
-.config(['flowFactoryProvider', function (flowFactoryProvider) {
-  flowFactoryProvider.defaults = {
-    permanentErrors: [404, 500, 501],
-    maxChunkRetries: 1,
-    chunkRetryInterval: 5000,
-    simultaneousUploads: 4
+.filter('truncate', function() {
+  return function(string, size) {
+    return string.substring(0, size)+'...';
   };
-  flowFactoryProvider.on('catchAll', function (event) {
-    console.log('catchAll', arguments);
-  });
-  // Can be used with different implementations of Flow.js
-  // flowFactoryProvider.factory = fustyFlowFactory;
-}])
+})
 
 /**
  * And of course we define a controller for our route.
@@ -179,7 +170,7 @@ angular.module( 'App.list', [
             uri: dirs[i].subject.uri,
             path: base+basename(dirs[i].subject.uri)+'/',
             type: 'Directory',
-            name: basename(dirs[i].subject.value),
+            name: decodeURIComponent(basename(dirs[i].subject.value).replace("+", "%20")),
             mtime: g.any(dirs[i].subject, POSIX("mtime")).value,
             size: '-'
           };
@@ -195,7 +186,7 @@ angular.module( 'App.list', [
           uri: files[i].subject.uri,
           path: '#/view/'+stripSchema(files[i].subject.uri),
           type: 'File', // TODO: use the real type
-          name: basename(files[i].subject.value),
+          name: decodeURIComponent(basename(files[i].subject.value).replace("+", "%20")),
           mtime: g.any(files[i].subject, POSIX("mtime")).value,
           size: g.any(files[i].subject, POSIX("size")).value
         };
@@ -212,7 +203,6 @@ angular.module( 'App.list', [
 
   $scope.upload = function () {
     console.log("Uploading files");
-    console.log($flow.files);
   };
 
   $scope.newDir = function(dirName) {
@@ -220,7 +210,7 @@ angular.module( 'App.list', [
     dirName = dirName.replace(/^\s+|\s+$/g, "");
     $http({
       method: 'PUT', 
-      url: $scope.path+dirName,
+      url: $scope.path+encodeURIComponent(dirName),
       data: '',
       headers: {
         'Content-Type': 'text/turtle',
@@ -234,16 +224,18 @@ angular.module( 'App.list', [
         // add dir to local list
         var now = new Date().getTime();
         var base = (document.location.href.charAt(document.location.href.length - 1) === '/')?document.location.href:document.location.href+'/';
-        var d = {
-            uri: $scope.path+dirName,
-            path: base+basename($scope.path+dirName)+'/',
-            type: 'Directory',
-            name: dirName,
-            mtime: now,
-            size: '-'
-          };
-        $scope.resources.push(d);
+        addResource($scope.path+dirName, 'Directory');
         $scope.emptyDir = false;
+        // var d = {
+        //     uri: $scope.path+dirName,
+        //     path: base+basename($scope.path+dirName)+'/',
+        //     type: 'Directory',
+        //     name: decodeURIComponent(dirName),
+        //     mtime: now,
+        //     size: '-'
+        //   };
+        // $scope.resources.push(d);
+        // $scope.emptyDir = false;
       }
     }).
     error(function(data, status) {
@@ -262,7 +254,7 @@ angular.module( 'App.list', [
     fileName = fileName.replace(/^\s+|\s+$/g, "");
     $http({
       method: 'PUT', 
-      url: $scope.path+fileName,
+      url: $scope.path+encodeURIComponent(fileName),
       data: '',
       headers: {
         'Content-Type': 'text/turtle',
@@ -275,17 +267,7 @@ angular.module( 'App.list', [
         notify('Success', 'Resource created.');
         // Add resource to the list
         var res = headers('Location');
-        var f = {
-          uri: res,
-          path: '#/view/'+stripSchema(res),
-          type: 'File', // TODO: use the real type
-          name: basename(res),
-          mtime: moment().fromNow(),
-          size: '-'
-        };
-        // TODO Refresh the view
-        $scope.resources.push(f);
-        // Add
+        addResource(res, 'File');
         $scope.emptyDir = false;
       }
     }).
@@ -312,7 +294,9 @@ angular.module( 'App.list', [
     }).
     success(function(data, status) {
       if (status == 200 || status == 201) {
-        notify('Success', 'Deleted '+basename(resourceUri)+'.');
+        //TODO: remove the acl and meta files.
+
+        notify('Success', 'Deleted '+decodeURIComponent(basename(resourceUri)+'.'));
         $scope.removeResource(resourceUri);
       }
     }).
@@ -375,11 +359,19 @@ angular.module( 'App.list', [
     modalInstance.result.then($scope.deleteResource);
   };
   // New file upload dialog
-  $scope.openNewUpload = function () {
+  $scope.openNewUpload = function (url) {
     var modalInstance = $modal.open({
       templateUrl: 'uploadfiles.html',
       controller: ModalUploadCtrl,
-      size: 'sm'
+      size: 'sm',
+      resolve: { 
+        url: function () {
+          return url;
+        },
+        resources: function () {
+          return $scope.resources;
+        }
+      }
     });
   };
 
@@ -389,7 +381,39 @@ angular.module( 'App.list', [
   } else {
     $scope.listLocation = false;
   }
- });
+});
+
+
+var addResource = function (resources, uri, type, size) {
+  // Add resource to the list
+  var base = (document.location.href.charAt(document.location.href.length - 1) === '/')?document.location.href:document.location.href+'/';
+  var path = (type === 'File')?'#/view/'+stripSchema(uri):base+basename(uri)+'/';
+  var now = new Date().getTime();
+  size = (size)?size:'-';
+  var f = {
+    uri: uri,
+    path: path,
+    type: type, // TODO: use the real type
+    name: decodeURIComponent(basename(uri)),
+    mtime: now,
+    size: size
+  };
+  // overwrite previous resource
+  var found = false;
+  if (resources) {
+    for(var i = resources.length - 1; i >= 0; i--){
+      if(resources[i].uri == uri) {
+        resources[i] = f;
+        found = true;
+        break;
+      }
+    }
+    if (!found) {
+      resources.push(f);
+    }
+  }
+};
+
 
 // Modal Ctrls
 var ModalNewDirCtrl = function ($scope, $modalInstance) {
@@ -437,5 +461,52 @@ var ModalDeleteCtrl = function ($scope, $modalInstance, delUri) {
   $scope.cancel = function () {
     $modalInstance.dismiss('cancel');
   };
+};
 
+var ModalUploadCtrl = function ($scope, $modalInstance, $upload, url, resources) {
+  $scope.url = url;
+  $scope.resources = resources;
+  $scope.container = basename(url);
+
+  $scope.doUpload = function(file) {
+    $scope.progress[file.name] = 0;
+    file.name = file.name.replace(/^\s+|\s+$/g, "");
+    $upload.upload({
+        url: $scope.url+encodeURIComponent(file.name),
+        method: 'PUT',
+        withCredentials: true,
+        file: file // or list of files ($files) for html5 only
+      }).progress(function(evt) {
+        var progVal = parseInt(100.0 * evt.loaded / evt.total, 10);
+        $scope.progress[file.name] = progVal;
+      }).success(function(data, status, headers, config) {
+        // file is uploaded successfully
+        addResource($scope.resources, $scope.url+encodeURIComponent(file.name), 'File', file.size);
+        console.log(data);
+      // }).error(function(data, status, headers) {
+      //   console.log('Error uploading '+file.name+"! Status: "+status + "Error: "+data);
+      });
+  };
+
+  $scope.onFileSelect = function($files) {
+    //$files: an array of files selected, each file has name, size, and type.
+    $scope.selectedFiles = $files;
+    $scope.progress = []; 
+    for (var i = 0; i < $files.length; i++) {
+      var file = $files[i];
+      $scope.upload = $scope.doUpload(file);
+      //.error(...)
+      //.then(success, error, progress); 
+      // access or attach event listeners to the underlying XMLHttpRequest.
+      //.xhr(function(xhr){xhr.upload.addEventListener(...)})
+    }
+  };
+
+  $scope.ok = function () {
+    $modalInstance.close();
+  };
+
+  $scope.cancel = function () {
+    $modalInstance.dismiss('cancel');
+  };
 };
