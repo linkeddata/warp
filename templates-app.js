@@ -114,6 +114,7 @@ angular.module("list/list.tpl.html", []).run(["$templateCache", function($templa
     "              <!-- <span ng-hide=\"newFileName.fileName.$valid\">Only use: a-z A-Z 0-9 _ - .</span> -->\n" +
     "            </fieldset>\n" +
     "          </form>\n" +
+    "          <br/><small class=\"orange\">Warning: creating a new file may overwrite an existing one with the same name!</small>\n" +
     "        </div>\n" +
     "        <div class=\"modal-footer\">\n" +
     "          <button class=\"btn btn-primary\" ng-click=\"newFile(fileName)\">OK</button>\n" +

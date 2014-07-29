@@ -224,7 +224,7 @@ angular.module( 'App.list', [
         // add dir to local list
         var now = new Date().getTime();
         var base = (document.location.href.charAt(document.location.href.length - 1) === '/')?document.location.href:document.location.href+'/';
-        addResource($scope.path+dirName, 'Directory');
+        addResource($scope.resources, $scope.path+dirName, 'Directory');
         $scope.emptyDir = false;
         // var d = {
         //     uri: $scope.path+dirName,
@@ -267,7 +267,7 @@ angular.module( 'App.list', [
         notify('Success', 'Resource created.');
         // Add resource to the list
         var res = headers('Location');
-        addResource(res, 'File');
+        addResource($scope.resources, res, 'File');
         $scope.emptyDir = false;
       }
     }).
@@ -400,7 +400,7 @@ var addResource = function (resources, uri, type, size) {
   };
   // overwrite previous resource
   var found = false;
-  if (resources) {
+  if (resources.length > 0) {
     for(var i = resources.length - 1; i >= 0; i--){
       if(resources[i].uri == uri) {
         resources[i] = f;
@@ -408,9 +408,9 @@ var addResource = function (resources, uri, type, size) {
         break;
       }
     }
-    if (!found) {
-      resources.push(f);
-    }
+  }
+  if (!found) {
+    resources.push(f);
   }
 };
 
