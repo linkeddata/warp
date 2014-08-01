@@ -66,7 +66,11 @@ angular.module( 'App.list', [
 
 .filter('truncate', function() {
   return function(string, size) {
-    return string.substring(0, size)+'...';
+    if (string.length > size) {
+      return string.substring(0, size)+'...';
+    } else {
+      return string;
+    }
   };
 })
 
@@ -184,7 +188,7 @@ angular.module( 'App.list', [
       for (i in files) {
         var f = {
           uri: files[i].subject.uri,
-          path: '#/view/'+stripSchema(files[i].subject.uri),
+          path: files[i].subject.uri,
           type: 'File', // TODO: use the real type
           name: decodeURIComponent(basename(files[i].subject.value).replace("+", "%20")),
           mtime: g.any(files[i].subject, POSIX("mtime")).value,
@@ -226,16 +230,6 @@ angular.module( 'App.list', [
         var base = (document.location.href.charAt(document.location.href.length - 1) === '/')?document.location.href:document.location.href+'/';
         addResource($scope.resources, $scope.path+dirName, 'Directory');
         $scope.emptyDir = false;
-        // var d = {
-        //     uri: $scope.path+dirName,
-        //     path: base+basename($scope.path+dirName)+'/',
-        //     type: 'Directory',
-        //     name: decodeURIComponent(dirName),
-        //     mtime: now,
-        //     size: '-'
-        //   };
-        // $scope.resources.push(d);
-        // $scope.emptyDir = false;
       }
     }).
     error(function(data, status) {
@@ -295,8 +289,6 @@ angular.module( 'App.list', [
     success(function(data, status) {
       if (status == 200 || status == 201) {
         //TODO: remove the acl and meta files.
-
-        notify('Success', 'Deleted '+decodeURIComponent(basename(resourceUri)+'.'));
         $scope.removeResource(resourceUri);
       }
     }).
@@ -318,6 +310,7 @@ angular.module( 'App.list', [
       for(var i = $scope.resources.length - 1; i >= 0; i--){
         if($scope.resources[i].uri == uri) {
           $scope.resources.splice(i,1);
+          notify('Success', 'Deleted '+decodeURIComponent(basename(uri)+'.'));
           if ($scope.resources.length === 0) {
             $scope.emptyDir = true;
           }
@@ -387,7 +380,7 @@ angular.module( 'App.list', [
 var addResource = function (resources, uri, type, size) {
   // Add resource to the list
   var base = (document.location.href.charAt(document.location.href.length - 1) === '/')?document.location.href:document.location.href+'/';
-  var path = (type === 'File')?'#/view/'+stripSchema(uri):base+basename(uri)+'/';
+  var path = (type === 'File')?dirname(uri)+'/'+encodeURIComponent(basename(uri)):base+basename(uri)+'/';
   var now = new Date().getTime();
   size = (size)?size:'-';
   var f = {
@@ -449,7 +442,7 @@ var ModalNewFileCtrl = function ($scope, $modalInstance) {
 
 var ModalDeleteCtrl = function ($scope, $modalInstance, delUri) {
   $scope.delUri = delUri;
-
+  $scope.resource = decodeURIComponent(basename(delUri));
   $scope.deleteResource = function() {
     $modalInstance.close($scope.delUri);
   };
@@ -467,11 +460,14 @@ var ModalUploadCtrl = function ($scope, $modalInstance, $upload, url, resources)
   $scope.url = url;
   $scope.resources = resources;
   $scope.container = basename(url);
+  $scope.uploading = [];
+  $scope.progress = [];
+  $scope.filesUploading = 0;
 
   // stop/abort the upload of a file
   $scope.abort = function(index) {
     console.log($scope.uploading.length);
-    $scope.uploading[index].abort(); 
+    $scope.uploading[index].abort();
   };
 
   // remove file from upload list
@@ -488,36 +484,42 @@ var ModalUploadCtrl = function ($scope, $modalInstance, $upload, url, resources)
     }
   };
 
+  $scope.clearUploaded = function () {
+    $scope.selectedFiles = [];
+  };
+
+  $scope.$watch('filesUploading', function(newVal, oldVal) {
+    if (oldVal > 0 && newVal === 0) {
+      notify('Success', 'Finished uploading files!');
+    }
+  });
+
   // TODO: handle errors during upload
   $scope.doUpload = function(file) {
     $scope.progress[file.name] = 0;
     file.name = file.name.replace(/^\s+|\s+$/g, "");
     $scope.uploading[file.name] = $upload.upload({
-        url: $scope.url+encodeURIComponent(file.name),
-        method: 'PUT',
+        url: $scope.url,
+        method: 'POST',
         withCredentials: true,
-        file: file // or list of files ($files) for html5 only
+        file: file
       }).progress(function(evt) {
         var progVal = parseInt(100.0 * evt.loaded / evt.total, 10);
         $scope.progress[file.name] = progVal;
       }).success(function(data, status, headers, config) {
         // file is uploaded successfully
+        $scope.filesUploading--;
         addResource($scope.resources, $scope.url+encodeURIComponent(file.name), 'File', file.size);
-        console.log(data);
     });
   };
 
   $scope.onFileSelect = function($files) {
     $scope.selectedFiles = $files;
-    $scope.progress = [];
-    $scope.uploading = [];
+    $scope.filesUploading = $files.length;
+
     for (var i = 0; i < $files.length; i++) {
       var file = $files[i];
       $scope.doUpload(file);
-      //.error(...)
-      //.then(success, error, progress); 
-      // access or attach event listeners to the underlying XMLHttpRequest.
-      //.xhr(function(xhr){xhr.upload.addEventListener(...)})
     }
   };
 

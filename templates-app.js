@@ -59,8 +59,8 @@ angular.module("list/list.tpl.html", []).run(["$templateCache", function($templa
     "        <tr ng-show=\"emptyDir\">\n" +
     "          <td colspan=\"4\"><h2>No files found</h2></td>\n" +
     "        </tr>\n" +
-    "				<tr ng-repeat=\"res in resources|orderBy:['type','name']\" class=\"repeat-animation\">\n" +
-    "					<td colspan=\"{{res.type==='-'?4:1}}\"><a href=\"{{res.path}}\"><i class=\"fa\" ng-class=\"res.type=='Directory'||res.type==='-'?'fa-folder-open-o':'fa-file-o'\"></i> {{res.name}}</a></td>\n" +
+    "				<tr ng-repeat=\"res in resources|orderBy:['type','name']\">\n" +
+    "					<td colspan=\"{{res.type==='-'?4:1}}\"><a href=\"{{res.path}}\" target=\"{{res.type=='File'?'_blank':''}}\"><i class=\"fa\" ng-class=\"res.type=='Directory'||res.type==='-'?'fa-folder-open-o':'fa-file-o'\"></i> {{res.name}}</a></td>\n" +
     "					<td ng-hide=\"res.type==='-'\">{{res.size|fileSize}}</td>\n" +
     "					<td ng-hide=\"res.type==='-'\"><div tooltip-placement=\"bottom\" tooltip=\"{{res.mtime|classicDate}}\">{{res.mtime|fromNow}}</div></td>\n" +
     "					<td ng-hide=\"res.type==='-'\" class=\"center\">\n" +
@@ -132,7 +132,7 @@ angular.module("list/list.tpl.html", []).run(["$templateCache", function($templa
     "      <div class=\"modal-body\">\n" +
     "        <input type=\"file\" ng-file-select=\"onFileSelect($files)\" data-multiple=\"true\" multiple=\"multiple\">\n" +
     "        <div ng-file-drop=\"onFileSelect($files)\" ng-file-drag-over-class=\"'dropzone-on'\" class=\"dropzone\" ng-show=\"dropSupported\">\n" +
-    "          drop files here\n" +
+    "          Drop files here\n" +
     "        </div>\n" +
     "        <div ng-file-drop-available=\"dropSupported=true\" ng-show=\"!dropSupported\">\n" +
     "          HTML5 Drop File is not supported!\n" +
@@ -144,17 +144,18 @@ angular.module("list/list.tpl.html", []).run(["$templateCache", function($templa
     "            <td></td>\n" +
     "          </tr>\n" +
     "          <tr ng-repeat=\"file in selectedFiles\" ng-class=\"progress[file.name] == 100?'done':''\">\n" +
-    "            <td>{{file.name|truncate:30}}</td>\n" +
+    "            <td>{{file.name|truncate:25}}</td>\n" +
     "            <td><progressbar value=\"progress[file.name]\"></progressbar></td>\n" +
     "            <td class=\"pull-right\">\n" +
-    "              <a ng-hide=\"progress[file.name] == 100\" class=\"btn btn-mini btn-default\" ng-click=\"abort(file.name)\"><i class=\"fa fa-2x fa-times\"></i></a>\n" +
-    "              <a class=\"btn btn-mini btn-default\" ng-click=\"remove(file.name)\"><i class=\"fa fa-2x fa-trash-o\"></i></a>\n" +
+    "              <button ng-hide=\"progress[file.name] == 100\" class=\"btn btn-mini btn-default\" ng-click=\"abort(file.name)\"><i class=\"fa fa-2x fa-times\"></i></button>\n" +
+    "              <button ng-show=\"progress[file.name] == 100\" class=\"btn btn-mini btn-default\" ng-click=\"remove(file.name)\"><i class=\"fa fa-2x fa-trash-o\"></i></button>\n" +
     "            </td>\n" +
     "          </tr>\n" +
     "        </table>\n" +
     "      </div>\n" +
     "      <div class=\"modal-footer\">\n" +
-    "        <a class=\"btn btn-default\" ng-click=\"cancel()\">Close</a>\n" +
+    "        <button class=\"btn btn-default\" ng-click=\"clearUploaded()\" ng-show=\"selectedFiles.length > 0\">Clear uploaded</button>\n" +
+    "        <button class=\"btn btn-default\" ng-click=\"cancel()\">Close</button>\n" +
     "      </div>\n" +
     "    </div>\n" +
     "  </script>\n" +
@@ -166,10 +167,9 @@ angular.module("list/list.tpl.html", []).run(["$templateCache", function($templa
     "            <h3 class=\"modal-title\"><i class=\"fa fa-2x fa-trash-o fa-fw vmiddle\"></i> Delete resource</h3>\n" +
     "        </div>\n" +
     "        <div class=\"modal-body\">\n" +
-    "          <p>Are you sure you want to delete</p>\n" +
-    "          <p><strong>{{delUri}}</strong></p>\n" +
-    "          <br/>\n" +
-    "          <p><small>Note: make sure directories are empty before removing them.</small></p>\n" +
+    "          <p>Are you sure you want to delete:</p>\n" +
+    "          <p><strong>{{resource}}</strong></p>\n" +
+    "          <small>Note: make sure directories are empty before removing them.</small>\n" +
     "        </div>\n" +
     "        <div class=\"modal-footer\">\n" +
     "          <button class=\"btn btn-primary\" ng-click=\"deleteResource(resource)\">Yes</button>\n" +
