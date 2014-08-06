@@ -14,7 +14,7 @@
  */
 
 angular.module( 'App.list', [
-  'ui.router',
+  'ui.router',  
   'ngProgress',
   'ngAnimate',
   'ui.bootstrap',
@@ -72,6 +72,28 @@ angular.module( 'App.list', [
       return string;
     }
   };
+})
+
+/**
+ * Directives
+ */
+.directive('ngFocus', function($timeout) {
+    return {
+        link: function ( scope, element, attrs ) {
+            scope.$watch( attrs.ngFocus, function ( val ) {
+                if ( angular.isDefined( val ) && val ) {
+                    $timeout( function () { element[0].focus(); } );
+                }
+            }, true);
+
+            element.bind('blur', function () {
+                if ( angular.isDefined( attrs.ngFocusLost ) ) {
+                    scope.$apply( attrs.ngFocusLost );
+
+                }
+            });
+        }
+    };
 })
 
 /**
@@ -172,7 +194,7 @@ angular.module( 'App.list', [
           var base = (document.location.href.charAt(document.location.href.length - 1) === '/')?document.location.href:document.location.href+'/';
           d = {
             uri: dirs[i].subject.uri,
-            path: base+basename(dirs[i].subject.uri)+'/',
+            path: base+encodeURIComponent(basename(dirs[i].subject.uri))+'/',
             type: 'Directory',
             name: decodeURIComponent(basename(dirs[i].subject.value).replace("+", "%20")),
             mtime: g.any(dirs[i].subject, POSIX("mtime")).value,
@@ -410,6 +432,8 @@ var addResource = function (resources, uri, type, size) {
 
 // Modal Ctrls
 var ModalNewDirCtrl = function ($scope, $modalInstance) {
+  $scope.isFocused = true;
+  
   $scope.newDir = function(dirName) {
     $modalInstance.close(dirName);
   };
@@ -426,6 +450,8 @@ var ModalNewDirCtrl = function ($scope, $modalInstance) {
 var ModalNewFileCtrl = function ($scope, $modalInstance) {
   // TODO
   // $scope.expr = "/^[A-Za-z0-9_-(\.)]*$/";
+
+  $scope.isFocused = true;
 
   $scope.newFile = function(fileName) {
     $modalInstance.close(fileName);

@@ -89,7 +89,7 @@ angular.module("list/list.tpl.html", []).run(["$templateCache", function($templa
     "        <div class=\"modal-body\">\n" +
     "          <form name=\"newDirName\">\n" +
     "            <fieldset>\n" +
-    "              <input type=\"text\" ng-model=\"dirName\" name=\"dirName\" id=\"dirName\" class=\"nginput\" placeholder=\"dir name..\" autofocus />\n" +
+    "              <input type=\"text\" ng-model=\"dirName\" name=\"dirName\" id=\"dirName\" class=\"nginput\" placeholder=\"dir name..\" ng-focus=\"isFocused\" />\n" +
     "              <span ng-hide=\"newDirName.dirName.$valid\">Only use: a-z A-Z 0-9 _ -</span>\n" +
     "            </fieldset>\n" +
     "          </form>\n" +
@@ -110,7 +110,7 @@ angular.module("list/list.tpl.html", []).run(["$templateCache", function($templa
     "        <div class=\"modal-body\">\n" +
     "          <form name=\"newFileName\">\n" +
     "            <fieldset>\n" +
-    "              <input type=\"text\" ng-model=\"fileName\" name=\"fileName\" id=\"fileName\" class=\"nginput\" placeholder=\"file name..\" autofocus />\n" +
+    "              <input type=\"text\" ng-model=\"fileName\" name=\"fileName\" id=\"fileName\" class=\"nginput\" placeholder=\"file name..\" ng-focus=\"isFocused\" />\n" +
     "              <!-- <span ng-hide=\"newFileName.fileName.$valid\">Only use: a-z A-Z 0-9 _ - .</span> -->\n" +
     "            </fieldset>\n" +
     "          </form>\n" +

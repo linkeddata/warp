@@ -23,7 +23,7 @@ angular.module( 'App', [
 
 .controller( 'MainCtrl', function MainCtrl ( $scope, $location, $timeout, ngProgress ) {
   // Some default values
-  ngProgress.height('5px');
+  ngProgress.height('3px');
   ngProgress.color('#ff3c1f');
   $scope.appuri = window.location.hostname+window.location.pathname;
   $scope.userProfile = {};
