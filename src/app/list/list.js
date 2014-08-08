@@ -433,7 +433,7 @@ var addResource = function (resources, uri, type, size) {
 // Modal Ctrls
 var ModalNewDirCtrl = function ($scope, $modalInstance) {
   $scope.isFocused = true;
-  
+
   $scope.newDir = function(dirName) {
     $modalInstance.close(dirName);
   };
