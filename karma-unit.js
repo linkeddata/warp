@@ -20,7 +20,7 @@ module.exports = function ( karma ) {
       'vendor/ngProgress/ngProgress.min.js',
       'vendor/jquery/dist/jquery.min.js',
       'vendor/rdflib.js/rdflib.js',
-      'vendor/notifications/notify.js',
+      'vendor/notify/notify.js',
       'vendor/moment/moment.min.js',
       'vendor/ng-flow/ng-flow-standalone.js',
       'build/templates-app.js',

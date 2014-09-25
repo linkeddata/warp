@@ -1368,6 +1368,10 @@
   content: "\f196";
 }
 
+hr {
+  margin-top: 0px;
+  margin-bottom: 0px;
+}
 .index {
   font-size: 1.3em;
   position: relative;
@@ -1436,9 +1440,6 @@ caption {
   min-width: 45px;
   padding-right: 5px;
 }
-.modal-dialog {
-  width: 350px !important;
-}
 .shadow {
   -moz-box-shadow: 0 2px 2px 1px #ddd;
   -webkit-box-shadow: 0 2px 2px 1px #ddd;
@@ -1485,6 +1486,36 @@ caption {
 .create-new li {
   text-align: left;
   font-size: 1.3em;
+}
+.policy {
+  display: block;
+  padding-bottom: 15px;
+}
+.permission-icons {
+  min-height: 50px;
+  min-width: 70px;
+  vertical-align: top;
+  text-align: center;
+}
+.boxes {
+  width: 60%;
+  display: inline-flex;
+}
+.new-user {
+  width: 200px;
+  height: 30px;
+}
+.mode-label {
+  padding-left: 5px;
+  padding-right: 5px;
+  display: inline-flex;
+}
+.full-width {
+  width: 100% !important;
+}
+.spacer {
+  display: block;
+  padding-top: 10px;
 }
 .nginput {
   transition: 0.3s linear all;
@@ -7658,6 +7689,12 @@ h2 {
 .vmiddle {
   vertical-align: middle;
 }
+.vtop {
+  vertical-align: top;
+}
+.vbottom {
+  vertical-align: bottom;
+}
 /**
  * Buttons
  */
@@ -7698,6 +7735,7 @@ h1 {
   word-break: break-word;
   word-wrap: break-word;
   padding-bottom: 0px!important;
+  padding: 10px!important;
 }
 .half-width {
   width: 50%;

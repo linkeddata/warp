@@ -54,24 +54,24 @@ angular.module("list/list.tpl.html", []).run(["$templateCache", function($templa
     "					<th class=\"filename\">Name</th>\n" +
     "					<th>Size</th>\n" +
     "					<th>Modified</th>\n" +
-    "					<th class=\"right\">Action</th>\n" +
+    "					<th class=\"right\">More</th>\n" +
     "				</thead>\n" +
     "        <tr ng-show=\"emptyDir\">\n" +
     "          <td colspan=\"4\"><h2>No files found</h2></td>\n" +
     "        </tr>\n" +
-    "				<tr ng-repeat=\"res in resources|orderBy:['type','name']\">\n" +
-    "					<td colspan=\"{{res.type==='-'?4:1}}\"><a href=\"{{res.path}}\" target=\"{{res.type=='File'?'_blank':''}}\"><i class=\"fa\" ng-class=\"res.type=='Directory'||res.type==='-'?'fa-folder-open-o':'fa-file-o'\"></i> {{res.name}}</a></td>\n" +
+    "				<tr ng-repeat=\"res in resources|orderBy:['type','name'] track by res.id\">\n" +
+    "					<td colspan=\"{{res.type==='-'?4:1}}\"><a href=\"{{res.path}}\" target=\"{{res.type=='File'?'_blank':''}}\"><i class=\"fa fa-fw vmiddle\" ng-class=\"res.type=='Directory'||res.type==='-'?'fa-folder-open-o':'fa-file-o'\"></i> {{res.name}}</a></td>\n" +
     "					<td ng-hide=\"res.type==='-'\">{{res.size|fileSize}}</td>\n" +
     "					<td ng-hide=\"res.type==='-'\"><div tooltip-placement=\"bottom\" tooltip=\"{{res.mtime|classicDate}}\">{{res.mtime|fromNow}}</div></td>\n" +
-    "					<td ng-hide=\"res.type==='-'\" class=\"center\">\n" +
+    "					<td ng-hide=\"res.type==='-'\" class=\"right\">\n" +
     "						<div class=\"btn-group\" dropdown is-open=\"status.isopen\">\n" +
-    "              <button type=\"button\" class=\"btn btn-primary dropdown-toggle\" ng-disabled=\"disabled\">\n" +
-    "                <i class=\"fa fa-angle-double-down\"></i>\n" +
-    "              </button>\n" +
+    "                          <button type=\"button\" class=\"btn btn-primary dropdown-toggle\" ng-disabled=\"disabled\">\n" +
+    "                            <i class=\"fa fa-angle-double-down\"></i>\n" +
+    "                          </button>\n" +
     "					      <ul class=\"dropdown-menu dropdown-menu-right left\" role=\"menu\">\n" +
-    "					        <li><a href=\"#\" ng-show=\"res.type != 'Directory'\"><i class=\"fa fa-2x fa-pencil-square-o fa-fw vmiddle\"></i> View/Edit</a></li>\n" +
-    "					        <li><a href=\"#\"><i class=\"fa fa-2x fa-unlock-alt fa-fw vmiddle\"></i> Permissions</a></li>\n" +
-    "					        <li><a href ng-click=\"openDelete(res.uri)\"><i class=\"fa fa-2x fa-trash-o fa-fw vmiddle\"></i> Delete</a></li>\n" +
+    "					        <!-- <li><a ng-show=\"res.type != 'Directory'\"><i class=\"fa fa-2x fa-pencil-square-o fa-fw vmiddle\"></i> View/Edit</a></li> -->\n" +
+    "					        <li><a ng-click=\"openACLEditor(res.uri, res.type)\"><i class=\"fa fa-2x fa-unlock-alt fa-fw vmiddle\"></i> Permissions</a></li>\n" +
+    "					        <li><a ng-click=\"openDelete(res.uri)\"><i class=\"fa fa-2x fa-trash-o fa-fw vmiddle\"></i> Delete</a></li>\n" +
     "					      </ul>\n" +
     "					    </div>\n" +
     "					</td>\n" +
@@ -143,7 +143,7 @@ angular.module("list/list.tpl.html", []).run(["$templateCache", function($templa
     "            <td><strong>Status</strong></td>\n" +
     "            <td></td>\n" +
     "          </tr>\n" +
-    "          <tr ng-repeat=\"file in selectedFiles\" ng-class=\"progress[file.name] == 100?'done':''\">\n" +
+    "          <tr ng-repeat=\"file in selectedFiles track by $index\" ng-class=\"progress[file.name] == 100?'done':''\">\n" +
     "            <td>{{file.name|truncate:25}}</td>\n" +
     "            <td><progressbar value=\"progress[file.name]\"></progressbar></td>\n" +
     "            <td class=\"pull-right\">\n" +
@@ -173,6 +173,149 @@ angular.module("list/list.tpl.html", []).run(["$templateCache", function($templa
     "        </div>\n" +
     "        <div class=\"modal-footer\">\n" +
     "          <button class=\"btn btn-primary\" ng-click=\"deleteResource(resource)\">Yes</button>\n" +
+    "          <button class=\"btn btn-warning\" ng-click=\"cancel()\">Cancel</button>\n" +
+    "        </div>\n" +
+    "    </div>\n" +
+    "  </script>\n" +
+    "  \n" +
+    "  <!-- ACL editor modal -->\n" +
+    "  <script type=\"text/ng-template\" id=\"acleditor.html\">\n" +
+    "    <div>\n" +
+    "      <div class=\"modal-header\">\n" +
+    "        <h3 class=\"modal-title\">Permissions for <strong>{{resource}}</strong></h3>\n" +
+    "        <img ng-src=\"assets/loading.gif\" ng-show=\"loading\">  \n" +
+    "      </div>\n" +
+    "        <div class=\"modal-body\">\n" +
+    "          <table class=\"full-width\">\n" +
+    "            <tr>\n" +
+    "              <td class=\"pull-left\">\n" +
+    "                <div class=\"permission-icons\">\n" +
+    "                  <strong>Owners</strong>\n" +
+    "                  <br/>\n" +
+    "                  <i class=\"fa fa-2x fa-lock vmiddle\"></i>\n" +
+    "                </div>\n" +
+    "              </td>\n" +
+    "              <td class=\"vtop\">\n" +
+    "                <div class=\"policy\" ng-show=\"policies.length <= 1\">\n" +
+    "                  <h3 class=\"orange\">Attention!</h3>\n" +
+    "                  You will not be able to update this policy in the future if you do not set at least one owner. Click the button below to add an owner.\n" +
+    "                </div>\n" +
+    "                <div class=\"policy\" ng-repeat=\"policy in policies|filter:{cat: 'owner'}\">\n" +
+    "                  <div class=\"pull-left\">\n" +
+    "                    <img ng-src=\"assets/loading.gif\" ng-show=\"policy.loading\" />\n" +
+    "                    <button class=\"btn btn-sm\" ng-click=\"removeUser(policy.uri, policy.webid)\" ng-hide=\"policy.loading\"><i class=\"fa fa-trash-o orange\"></i></button>\n" +
+    "                    <a href=\"{{policy.webid}}\" target=\"_blank\">{{trunc(policy.fullname, 25)}}</a>\n" +
+    "                  </div>\n" +
+    "                  <br/>\n" +
+    "                </div>\n" +
+    "                <div class=\"spacer\">\n" +
+    "                  <div class=\"policy\" ng-show=\"newUser['owner']\">\n" +
+    "                    <input class=\"new-user\" type=\"text\" ng-model=\"newUser['owner'].webid\" />\n" +
+    "                    <button class=\"btn btn-sm btn-primary\" ng-click=\"addNewUser('owner', newUser['owner'].webid)\"><i class=\"fa fa-plus\"></i></button>\n" +
+    "                    <button class=\"btn btn-sm\" ng-click=\"cancelNewUser('owner')\">Cancel</button>\n" +
+    "                    <br/>\n" +
+    "                  </div>\n" +
+    "                  <button class=\"btn btn-primary\" ng-click=\"showNewUser('owner')\">Add</button>\n" +
+    "                </div>\n" +
+    "              </td>\n" +
+    "            </tr>\n" +
+    "            <tr><td colspan=\"2\"><hr/></td></tr>\n" +
+    "            <tr>\n" +
+    "              <td class=\"pull-left\">\n" +
+    "                <div class=\"permission-icons\">\n" +
+    "                  <strong>Users</strong>\n" +
+    "                  <br/>\n" +
+    "                  <i class=\"fa fa-2x fa-user vmiddle\"></i>\n" +
+    "                </div>\n" +
+    "              </td>\n" +
+    "              <td class=\"vtop\">\n" +
+    "                <div class=\"policy\" ng-repeat=\"policy in policies|filter:{cat: 'user'}\">\n" +
+    "                  <div class=\"pull-left\">\n" +
+    "                    <img ng-src=\"assets/loading.gif\" ng-show=\"policy.loading\" />\n" +
+    "                    <button class=\"btn btn-sm\" ng-click=\"removeUser(policy.uri, policy.webid)\" ng-hide=\"policy.loading\"><i class=\"fa fa-trash-o orange\"></i></button>\n" +
+    "                    <a href=\"{{policy.webid}}\" target=\"_blank\">{{trunc(policy.fullname, 25)}}</a>\n" +
+    "                  </div>\n" +
+    "                  <div class=\"boxes pull-right\">\n" +
+    "                      <input type=\"checkbox\" ng-model=\"policy.modes.Read\"/><div class=\"mode-label\">Read</div>\n" +
+    "                      <input type=\"checkbox\" ng-model=\"policy.modes.Write\"/><div class=\"mode-label\">Write</div>\n" +
+    "                      <input type=\"checkbox\" ng-model=\"policy.modes.Append\"/><div class=\"mode-label\" tooltip-placement=\"bottom\" tooltip=\"Able to write without reading or deleting.\">Append</div>\n" +
+    "                      <input type=\"checkbox\" ng-model=\"policy.defaultForNew\" ng-show=\"resType == 'Directory'\"/><div class=\"mode-label\" tooltip-placement=\"bottom\" tooltip=\"Applies to all resources within this directory.\" ng-show=\"resType == 'Directory'\">Recursive</div>\n" +
+    "                  </div>\n" +
+    "                  <br/>\n" +
+    "                </div>\n" +
+    "                <div class=\"spacer\">\n" +
+    "                  <div class=\"policy\" ng-show=\"newUser['user']\">\n" +
+    "                    <input class=\"new-user\" type=\"text\" ng-model=\"newUser['user'].webid\" />\n" +
+    "                    <button class=\"btn btn-sm btn-primary\" ng-click=\"addNewUser('user', newUser['user'].webid)\"><i class=\"fa fa-plus\"></i></button>\n" +
+    "                    <button class=\"btn btn-sm\" ng-click=\"cancelNewUser('user')\">Cancel</button>\n" +
+    "                    <br/>\n" +
+    "                  </div>\n" +
+    "                  <button class=\"btn btn-primary\" ng-click=\"showNewUser('user')\">Add</button>\n" +
+    "                </div>\n" +
+    "              </td>\n" +
+    "            </tr>\n" +
+    "            <tr><td colspan=\"2\"><hr/></td></tr>\n" +
+    "            <tr>\n" +
+    "              <td class=\"pull-left\">\n" +
+    "                <div class=\"permission-icons\">\n" +
+    "                  <strong>Groups</strong>\n" +
+    "                  <br/>\n" +
+    "                  <i class=\"fa fa-2x fa-users vmiddle\"></i>\n" +
+    "                </div>\n" +
+    "              </td>\n" +
+    "              <td class=\"vtop\">\n" +
+    "                <div class=\"policy\" ng-repeat=\"policy in policies|filter:{cat: 'group'}\">\n" +
+    "                  <div class=\"pull-left\">\n" +
+    "                    <img ng-src=\"assets/loading.gif\" ng-show=\"policy.loading\" />\n" +
+    "                    <button class=\"btn btn-sm\" ng-click=\"removeUser(policy.uri, policy.webid)\" ng-hide=\"policy.loading\"><i class=\"fa fa-trash-o orange\"></i></button>\n" +
+    "                    <a href=\"{{policy.webid}}\" target=\"_blank\">{{trunc(policy.fullname, 25)}}</a>\n" +
+    "                  </div>\n" +
+    "                  <div class=\"boxes pull-right\">\n" +
+    "                      <input type=\"checkbox\" ng-model=\"policy.modes.Read\"/><div class=\"mode-label\">Read</div>\n" +
+    "                      <input type=\"checkbox\" ng-model=\"policy.modes.Write\"/><div class=\"mode-label\">Write</div>\n" +
+    "                      <input type=\"checkbox\" ng-model=\"policy.modes.Append\"/><div class=\"mode-label\" tooltip-placement=\"bottom\" tooltip=\"Able to write without reading or deleting.\">Append</div>\n" +
+    "                      <input type=\"checkbox\" ng-model=\"policy.defaultForNew\" ng-show=\"resType == 'Directory'\"/><div class=\"mode-label\" tooltip-placement=\"bottom\" tooltip=\"Applies to all resources within this directory.\" ng-show=\"resType == 'Directory'\">Recursive</div>\n" +
+    "                  </div>\n" +
+    "                  <br/>\n" +
+    "                </div>\n" +
+    "                <div class=\"spacer\">\n" +
+    "                  <div class=\"policy\" ng-show=\"newUser['group']\">\n" +
+    "                    <input class=\"new-user\" type=\"text\" ng-model=\"newUser['group'].webid\" />\n" +
+    "                    <button class=\"btn btn-sm btn-primary\" ng-click=\"addNewUser('group', newUser['group'].webid)\"><i class=\"fa fa-plus\"></i></button>\n" +
+    "                    <button class=\"btn btn-sm\" ng-click=\"cancelNewUser('group')\">Cancel</button>\n" +
+    "                    <br/>\n" +
+    "                  </div>\n" +
+    "                  <button class=\"btn btn-primary\" ng-click=\"showNewUser('group')\">Add</button>\n" +
+    "                </div>\n" +
+    "              </td>\n" +
+    "            </tr>\n" +
+    "            <tr><td colspan=\"2\"><hr/></td></tr>\n" +
+    "            <tr>\n" +
+    "              <td class=\"pull-left\">\n" +
+    "                <div class=\"permission-icons\">\n" +
+    "                  <strong>Others</strong>\n" +
+    "                  <br/>\n" +
+    "                  <i class=\"fa fa-2x fa-unlock-alt vmiddle\"></i>\n" +
+    "                </div>\n" +
+    "              </td>\n" +
+    "              <td class=\"vtop\">\n" +
+    "                <div ng-repeat=\"policy in policies|filter:{cat: 'other'}|limitTo:1\">\n" +
+    "                  <div class=\"pull-left\">\n" +
+    "                   Everyone\n" +
+    "                  </div>\n" +
+    "                  <div class=\"boxes pull-right\">\n" +
+    "                      <input type=\"checkbox\" ng-model=\"policy.modes.Read\"/><div class=\"mode-label\">Read</div>\n" +
+    "                      <input type=\"checkbox\" ng-model=\"policy.modes.Write\"/><div class=\"mode-label\">Write</div>\n" +
+    "                      <input type=\"checkbox\" ng-model=\"policy.modes.Append\"/><div class=\"mode-label\" tooltip-placement=\"bottom\" tooltip=\"Able to write without reading or deleting.\">Append</div>\n" +
+    "                      <input type=\"checkbox\" ng-model=\"policy.defaultForNew\" ng-show=\"resType == 'Directory'\"/><div class=\"mode-label\" tooltip-placement=\"bottom\" tooltip=\"Applies to all resources within this directory.\" ng-show=\"resType == 'Directory'\">Recursive</div>\n" +
+    "                  </div>\n" +
+    "                </div>\n" +
+    "              </td>\n" +
+    "            </tr>\n" +
+    "          </table>\n" +
+    "        </div>\n" +
+    "        <div class=\"modal-footer\">\n" +
+    "          <button class=\"btn btn-primary\" ng-click=\"setAcl()\">Set permissions</button>\n" +
     "          <button class=\"btn btn-warning\" ng-click=\"cancel()\">Cancel</button>\n" +
     "        </div>\n" +
     "    </div>\n" +
