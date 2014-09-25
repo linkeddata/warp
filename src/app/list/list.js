@@ -687,9 +687,11 @@ var ModalACLEditor = function ($scope, $modalInstance, $http, uri, aclURI, type,
   $scope.uri = uri;
   $scope.aclURI = aclURI;
   $scope.resType = type;
+  $scope.gotOwner = false;
   $scope.resource = decodeURIComponent(basename(uri));
   $scope.policies = [];
   $scope.newUser = [];
+  $scope.webidresults = [];
   
   $scope.loading = true;
     
@@ -777,6 +779,7 @@ var ModalACLEditor = function ($scope, $modalInstance, $http, uri, aclURI, type,
               policy.cat = 'other';
             } else if (policy.modes.Control === true) {
               policy.cat = 'owner';
+              $scope.gotOwner = true;
             } else {
               policy.cat = cat;
             }
@@ -808,6 +811,17 @@ var ModalACLEditor = function ($scope, $modalInstance, $http, uri, aclURI, type,
     $scope.loading = false;
   }
   
+  $scope.haveCategory = function (cat) {
+    if ($scope.policies) {
+      for (var i=0; i<$scope.policies; i++) {
+        if ($scope.policies[i].cat == cat) {
+          return true; 
+        }
+      }
+    }
+    return false;
+  };
+  
   $scope.serializeTurtle = function () {
     var RDF = $rdf.Namespace("http://www.w3.org/1999/02/22-rdf-syntax-ns#");
     var RDFS = $rdf.Namespace("http://www.w3.org/2000/01/rdf-schema#");
@@ -816,29 +830,28 @@ var ModalACLEditor = function ($scope, $modalInstance, $http, uri, aclURI, type,
 
     var g = new $rdf.graph();
 
-    if ($scope.policies.length > 0) {      
+    if ($scope.policies.length > 0) {
       for (var i=0; i<$scope.policies.length;i++) {
-        g.add($rdf.sym("#"+i), RDF("type"), WAC('Authorization'));
-        g.add($rdf.sym("#"+i), WAC("accessTo"), $rdf.sym(decodeURIComponent($scope.uri)));
-        if ($scope.policies[i].isGroup && $scope.policies[i].isGroup === true) {
-          g.add($rdf.sym("#"+i), WAC("agentClass"), $rdf.sym($scope.policies[i].webid));
-        } else {
-          g.add($rdf.sym("#"+i), WAC("agent"), $rdf.sym($scope.policies[i].webid));
-        }
-        if ($scope.policies[i].defaultForNew && $scope.policies[i].defaultForNew === true) {
-          g.add($rdf.sym("#"+i), WAC("defaultForNew"), $rdf.sym(decodeURIComponent($scope.uri))); 
-        }
-        if ($scope.policies[i].cat == "owner" && $scope.aclURI.length > 0) {
-          g.add($rdf.sym("#"+i), WAC("accessTo"), $rdf.sym(decodeURIComponent($scope.aclURI)));
-          g.add($rdf.sym("#"+i), WAC("defaultForNew"), $rdf.sym(decodeURIComponent($scope.uri)));
-          g.add($rdf.sym("#"+i), WAC("mode"), WAC("Control"));
-        } else {
+      //  if ($scope.policies[i].webid = FOAF("Agent").uri) {
+          g.add($rdf.sym("#"+i), RDF("type"), WAC('Authorization'));
+          g.add($rdf.sym("#"+i), WAC("accessTo"), $rdf.sym(decodeURIComponent($scope.uri)));
+          if ($scope.policies[i].isGroup && $scope.policies[i].isGroup === true) {
+            g.add($rdf.sym("#"+i), WAC("agentClass"), $rdf.sym($scope.policies[i].webid));
+          } else {
+            g.add($rdf.sym("#"+i), WAC("agent"), $rdf.sym($scope.policies[i].webid));
+          }
+          if ($scope.policies[i].defaultForNew && $scope.policies[i].defaultForNew === true) {
+            g.add($rdf.sym("#"+i), WAC("defaultForNew"), $rdf.sym(decodeURIComponent($scope.uri))); 
+          }
+          if ($scope.policies[i].cat == "owner" && $scope.aclURI.length > 0) {
+            g.add($rdf.sym("#"+i), WAC("accessTo"), $rdf.sym(decodeURIComponent($scope.aclURI)));
+            g.add($rdf.sym("#"+i), WAC("defaultForNew"), $rdf.sym(decodeURIComponent($scope.uri)));
+          }
           for (var mode in $scope.policies[i].modes) {
             if ($scope.policies[i].modes[mode] === true) {
               g.add($rdf.sym("#"+i), WAC("mode"), WAC(mode));
             }
           }
-        }
       }
     }
     var s = new $rdf.Serializer(g).toN3(g);
@@ -857,6 +870,7 @@ var ModalACLEditor = function ($scope, $modalInstance, $http, uri, aclURI, type,
     }).
     success(function() {
       notify('Success', 'Updated ACL policies.');
+      //todo add the acl file to the list of files
       $modalInstance.close();
     }).
     error(function(data, status, headers) {
@@ -883,9 +897,41 @@ var ModalACLEditor = function ($scope, $modalInstance, $http, uri, aclURI, type,
     var user = {};
     user.webid = webid;
     user.cat = cat;
-    getProfile($scope, webid, user);
+    if (cat == 'owner') {
+      $scope.gotOwner = true;
+      user.modes = {Read: true, Write: true, Control: true};
+    }
+    user.fullname = webid;
+    user.loading = getProfile($scope, webid, user);
     $scope.policies.push(user);
+    
     $scope.newUser[cat] = undefined;
+  };
+  
+  // attempt to find a person using webizen.org
+  $scope.lookupWebID = function(query) {
+    // get results from server
+    return $http.get('http://api.webizen.org/v1/search', {
+      params: {
+        q: query
+      }
+    }).then(function(response) {
+        var matches = [];
+        if (response.data) {
+          angular.forEach(response.data, function(value, key) {
+            var match = {};
+            match.webid = key;
+            if (!value.img) {
+              match.img = 'assets/generic_photo.png';
+            } else {
+              match.img = value.img[0];
+            }
+            match.name = value.name[0] + ' ('+key+')';
+            matches.push(match);
+          });
+        }
+        return matches;
+    });
   };
   
   $scope.cancelNewUser = function(cat) {
