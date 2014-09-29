@@ -237,7 +237,7 @@ angular.module( 'App.list', [
 
   $scope.newDir = function(dirName) {
     // trim whitespaces
-    dirName = dirName.replace(/^\s+|\s+$/g, "");
+    dirName = dirName.replace(/^\s+|\s+$/g, ""); 
     $http({
       method: 'PUT', 
       url: $scope.path+encodeURIComponent(dirName),

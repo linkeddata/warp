@@ -11,13 +11,14 @@ var getProfile = function(scope, uri, profile) {
   profile.loading = true;
 
   // fetch user data
-  f.nowOrWhenFetched(docURI,undefined,function(ok, body) {
+  return f.nowOrWhenFetched(docURI,undefined,function(ok, body) {
     if (!ok) {
       profile.uri = uri;
       profile.name = uri;
       console.log('Warning - profile not found.');
       profile.loading = false;
       scope.$apply();
+      return false;
     } else {
       // get some basic info
       var name = g.any(webidRes, FOAF('name'));
@@ -41,6 +42,7 @@ var getProfile = function(scope, uri, profile) {
       profile.loading = false;
       
       scope.$apply();
+      return true;
     }
   });
 };

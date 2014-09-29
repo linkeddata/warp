@@ -210,7 +210,7 @@ angular.module("list/list.tpl.html", []).run(["$templateCache", function($templa
     "                </div>\n" +
     "                <div class=\"spacer\">\n" +
     "                  <div class=\"policy\" ng-show=\"newUser['owner']\">\n" +
-    "                    <input class=\"new-user\" type=\"text\" ng-model=\"newUser['owner'].webid\" typeahead=\"match.webid as match.name for match in lookupWebID($viewValue)|filter:{name:$viewValue}|limitTo:8\" typeahead-loading=\"searchloading\" typeahead-min-length=\"2\" typeahead-wait-ms=\"500\"/>\n" +
+    "                    <input class=\"new-user\" type=\"text\" ng-model=\"newUser['owner'].webid\" typeahead=\"match.webid as match.name for match in lookupWebID($viewValue)|filter:{name:$viewValue}|limitTo:8\" typeahead-loading=\"searchloading\" typeahead-min-length=\"2\" typeahead-wait-ms=\"200\" typeahead-on-select=\"addNewUser('owner', $item.webid)\"/>\n" +
     "                    <img ng-src=\"assets/loading.gif\" ng-show=\"searchloading\" />\n" +
     "                    <button class=\"btn btn-sm btn-primary\" ng-click=\"addNewUser('owner', newUser['owner'].webid)\"><i class=\"fa fa-plus\"></i></button>\n" +
     "                    <button class=\"btn btn-sm\" ng-click=\"cancelNewUser('owner')\">Cancel</button>\n" +
@@ -246,7 +246,7 @@ angular.module("list/list.tpl.html", []).run(["$templateCache", function($templa
     "                </div>\n" +
     "                <div class=\"spacer\">\n" +
     "                  <div class=\"policy\" ng-show=\"newUser['user']\">\n" +
-    "                    <input class=\"new-user\" type=\"text\" ng-model=\"newUser['user'].webid\" typeahead=\"match.webid as match.name for match in lookupWebID($viewValue)|filter:{name:$viewValue}|limitTo:8\" typeahead-loading=\"searchloading\" typeahead-min-length=\"2\" typeahead-wait-ms=\"500\"/>\n" +
+    "                    <input class=\"new-user\" type=\"text\" ng-model=\"newUser['user'].webid\" typeahead=\"match.webid as match.name for match in lookupWebID($viewValue)|filter:{name:$viewValue}|limitTo:8\" typeahead-loading=\"searchloading\" typeahead-min-length=\"2\" typeahead-wait-ms=\"200\" typeahead-on-select=\"addNewUser('user', $item.webid)\"/>\n" +
     "                    <img ng-src=\"assets/loading.gif\" ng-show=\"searchloading\" />\n" +
     "                    <button class=\"btn btn-sm btn-primary\" ng-click=\"addNewUser('user', newUser['user'].webid)\"><i class=\"fa fa-plus\"></i></button>\n" +
     "                    <button class=\"btn btn-sm\" ng-click=\"cancelNewUser('user')\">Cancel</button>\n" +
@@ -282,7 +282,7 @@ angular.module("list/list.tpl.html", []).run(["$templateCache", function($templa
     "                </div>\n" +
     "                <div class=\"spacer\">\n" +
     "                  <div class=\"policy\" ng-show=\"newUser['group']\">\n" +
-    "                    <input class=\"new-user\" type=\"text\" ng-model=\"newUser['group'].webid\" typeahead=\"match.webid as match.name for match in lookupWebID($viewValue)|filter:{name:$viewValue}|limitTo:8\" typeahead-loading=\"searchloading\" typeahead-min-length=\"2\" typeahead-wait-ms=\"500\"/>\n" +
+    "                    <input class=\"new-user\" type=\"text\" ng-model=\"newUser['group'].webid\" typeahead=\"match.webid as match.name for match in lookupWebID($viewValue)|filter:{name:$viewValue}|limitTo:8\" typeahead-loading=\"searchloading\" typeahead-min-length=\"2\" typeahead-wait-ms=\"200\" typeahead-on-select=\"addNewUser('group', $item.webid)\"/>\n" +
     "                    <img ng-src=\"assets/loading.gif\" ng-show=\"searchloading\" />\n" +
     "                    <button class=\"btn btn-sm btn-primary\" ng-click=\"addNewUser('group', newUser['group'].webid)\"><i class=\"fa fa-plus\"></i></button>\n" +
     "                    <button class=\"btn btn-sm\" ng-click=\"cancelNewUser('group')\">Cancel</button>\n" +
