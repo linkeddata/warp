@@ -100,10 +100,6 @@ angular.module( 'App.list', [
  * And of course we define a controller for our route.
  */
 .controller( 'ListCtrl', function ListController( $scope, $http, $location, $modal, $sce, $stateParams, ngProgress ) {
-  $scope.hideMenu = function() {
-    $scope.$parent.showMenu = false;
-  };
-
   // variables
   $scope.schema = '';
   $scope.resources = [];
