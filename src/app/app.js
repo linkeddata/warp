@@ -9,7 +9,6 @@ angular.module( 'App', [
   'templates-app',
   'templates-common',
   'App.list',
-  'App.login',
   'App.about',
   'ui.router'
 ])
@@ -30,10 +29,6 @@ angular.module( 'App', [
   $scope.userProfile.picture = 'assets/generic_photo.png';
   $scope.notifStatus = getNotifStatus();
   $scope.notifEnabledTxt = ($scope.notifStatus=='granted')?'Notifications enabled.':'Notifications disabled.';
-
-  $scope.login = function () {
-    $location.path('/login');
-  };
 
   $scope.logout = function () {
     // Logout WebID (only works in Firefox and IE)

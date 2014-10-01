@@ -177,9 +177,7 @@ angular.module( 'App.list', [
 
       var dirs = g.statementsMatching(undefined, RDF("type"), POSIX("Directory"));
       for ( var i in dirs ) {
-        if ( dirs[i].subject.uri.split('://')[1].split('/').length <= 2 ) {
-          continue;
-        }
+        var root = (dirs[i].subject.uri.split('://')[1].split('/').length <= 2)?true:false;
         var d = {};
         if ( dirs[i].subject.uri == $scope.path ) {
           d = {
@@ -191,6 +189,10 @@ angular.module( 'App.list', [
             mtime: g.any(dirs[i].subject, POSIX("mtime")).value,
             size: '-'
           };
+          if (root) {
+            d.name = '/';
+            d.path = document.location.href;
+          }
         } else {
           var base = (document.location.href.charAt(document.location.href.length - 1) === '/')?document.location.href:document.location.href+'/';
           d = {
@@ -693,6 +695,7 @@ var ModalACLEditor = function ($scope, $modalInstance, $http, uri, aclURI, type,
   $scope.newUser = [];
   $scope.webidresults = [];
   
+  $scope.isFocused = true;
   $scope.loading = true;
     
   // Load ACL triples
@@ -709,7 +712,7 @@ var ModalACLEditor = function ($scope, $modalInstance, $http, uri, aclURI, type,
   // truncate string
   $scope.trunc = function (str, size) {
     if (str !== undefined) {
-      return (str.length > size - 3)?str.slice(0, size)+'...':str;
+      return (str.length > size)?str.slice(0, size)+'...':str;
     } else {
       return '';
     }
@@ -766,6 +769,7 @@ var ModalACLEditor = function ($scope, $modalInstance, $http, uri, aclURI, type,
             if (triples[i].object.uri === FOAF("Agent").uri) {
               policy.webid = FOAF("Agent").uri;
               policy.fullname = policy.webid;
+              policy.classtype = 'agentClass';
             } else {
               policy.webid = triples[i].object.uri;
               getProfile($scope, triples[i].object.uri, policy);
@@ -774,9 +778,8 @@ var ModalACLEditor = function ($scope, $modalInstance, $http, uri, aclURI, type,
             if ($scope.resType == 'Directory') {
               policy.defaultForNew = (g.statementsMatching(triples[i].subject, WAC("defaultForNew"), $rdf.sym($scope.uri)).length > 0)?true:false;
             }
-            policy.isGroup = (cat === 'group')?true:false;
             if (triples[i].object.uri === FOAF("Agent").uri) {
-              policy.cat = 'other';
+              policy.cat = 'any';
             } else if (policy.modes.Control === true) {
               policy.cat = 'owner';
               $scope.gotOwner = true;
@@ -793,8 +796,8 @@ var ModalACLEditor = function ($scope, $modalInstance, $http, uri, aclURI, type,
 
       var policies = g.statementsMatching(undefined, RDF("type"), WAC("Authorization"));
       if (policies.length > 0) {
-        $scope.getPolicies(g.statementsMatching(undefined, WAC("agent"), undefined), 'user', $scope.policies);
-        $scope.getPolicies(g.statementsMatching(undefined, WAC("agentClass"), undefined), 'group', $scope.policies);
+        $scope.getPolicies(g.statementsMatching(undefined, WAC("agent"), undefined), 'others', $scope.policies);
+        $scope.getPolicies(g.statementsMatching(undefined, WAC("agentClass"), undefined), 'others', $scope.policies);
 
         $scope.loading = false;
         $scope.$apply();
@@ -804,8 +807,8 @@ var ModalACLEditor = function ($scope, $modalInstance, $http, uri, aclURI, type,
     //todo add a default owner
     var others = {};
     others.webid = FOAF("Agent").uri;
-    others.cat = 'other';
-    others.isGroup = true;
+    others.cat = 'any';
+    others.classType = 'agentClass';
     others.modes = $scope.findModes();
     $scope.policies.push(others);
     $scope.loading = false;
@@ -835,12 +838,12 @@ var ModalACLEditor = function ($scope, $modalInstance, $http, uri, aclURI, type,
       //  if ($scope.policies[i].webid = FOAF("Agent").uri) {
           g.add($rdf.sym("#"+i), RDF("type"), WAC('Authorization'));
           g.add($rdf.sym("#"+i), WAC("accessTo"), $rdf.sym(decodeURIComponent($scope.uri)));
-          if ($scope.policies[i].isGroup && $scope.policies[i].isGroup === true) {
+          if ($scope.policies[i].classtype && $scope.policies[i].classtype == 'agentClass') {
             g.add($rdf.sym("#"+i), WAC("agentClass"), $rdf.sym($scope.policies[i].webid));
           } else {
             g.add($rdf.sym("#"+i), WAC("agent"), $rdf.sym($scope.policies[i].webid));
           }
-          if ($scope.policies[i].defaultForNew && $scope.policies[i].defaultForNew === true) {
+          if (($scope.policies[i].defaultForNew && $scope.policies[i].defaultForNew === true) || ($scope.policies[i].resType == 'Directory')) {
             g.add($rdf.sym("#"+i), WAC("defaultForNew"), $rdf.sym(decodeURIComponent($scope.uri))); 
           }
           if ($scope.policies[i].cat == "owner" && $scope.aclURI.length > 0) {

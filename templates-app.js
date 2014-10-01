@@ -1,4 +1,4 @@
-angular.module('templates-app', ['about/about.tpl.html', 'list/list.tpl.html', 'login/login.tpl.html']);
+angular.module('templates-app', ['about/about.tpl.html', 'list/list.tpl.html']);
 
 angular.module("about/about.tpl.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("about/about.tpl.html",
@@ -11,7 +11,36 @@ angular.module("about/about.tpl.html", []).run(["$templateCache", function($temp
 
 angular.module("list/list.tpl.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("list/list.tpl.html",
-    "<div class=\"container\" ng-click=\"hideMenu()\">\n" +
+    "<div class=\"container\">\n" +
+    "  <div class=\"topbar box-shadow\">\n" +
+    "    <div class=\"pull-left white vmiddle\" ng-hide=\"notifStatus=='granted'\"><h1><button ng-click=\"authorizeNotifications()\" class=\"btn btn-primary\"><i class=\"fa fa-bullhorn fa-2x white vmiddle\" ng-class=\"notifStatus=='granted'?'orange':''\"></i> Enable notifications</button></h1></div>\n" +
+    "    <div>\n" +
+    "      <table class=\"create-new\">\n" +
+    "      <tr>\n" +
+    "        <td>\n" +
+    "          <div class=\"btn-group\" dropdown>\n" +
+    "            <button type=\"button\" class=\"btn btn-success dropdown-toggle\" ng-disabled=\"disabled\" tooltip-placement=\"bottom\" tooltip=\"New...\"><i class=\"fa fa-2x fa-plus\"></i></button>\n" +
+    "            <ul class=\"dropdown-menu\" role=\"menu\">\n" +
+    "              <li><a href ng-click=\"openNewDir()\"><i class=\"fa fa-2x fa-folder-open-o fa-fw vmiddle\"></i> Directory</a></li>\n" +
+    "              <li><a href ng-click=\"openNewFile()\"><i class=\"fa fa-2x fa-file-o fa-fw vmiddle\"></i> File</a></li>\n" +
+    "              <li><a href ng-click=\"openNewUpload(path)\"><i class=\"fa fa-2x fa-cloud-upload fa-fw vmiddle\"></i> Upload</a></li>\n" +
+    "            </ul>\n" +
+    "          </div>\n" +
+    "        </td>\n" +
+    "        <td>\n" +
+    "          <div id=\"crumbs\" class=\"collapse navbar-collapse\">\n" +
+    "            <ul>\n" +
+    "              <li ng-repeat=\"crumb in breadCrumbs\">\n" +
+    "                <a href=\"{{crumb.uri}}\"><i class=\"fa white\" ng-class=\"$first?'fa-home':'fa-folder-open-o'\"></i><span class=\"white\"> {{crumb.name}}</span></a>\n" +
+    "              </li>\n" +
+    "            </ul>\n" +
+    "          </div>\n" +
+    "        </td>\n" +
+    "      </tr>\n" +
+    "    </table>\n" +
+    "    </div>\n" +
+    "  </div>\n" +
+    "  \n" +
     "  <div class=\"col-md-12\" ng-show=\"listLocation === false\">\n" +
     "    <div class=\"clear-70\"></div>\n" +
     "    <h1>Please provide a location for the data server:</h1>\n" +
@@ -24,61 +53,41 @@ angular.module("list/list.tpl.html", []).run(["$templateCache", function($templa
     "      </form>\n" +
     "    </div>\n" +
     "  </div>\n" +
-    "  <div ng-cloak class=\"col-md-12\" ng-show=\"listLocation === true\">\n" +
-    "    <table class=\"create-new\">\n" +
-    "      <tr>\n" +
-    "        <td>\n" +
-    "          <div class=\"btn-group\" dropdown>\n" +
-    "            <button type=\"button\" class=\"btn btn-success dropdown-toggle\" ng-disabled=\"disabled\" tooltip-placement=\"bottom\" tooltip=\"New...\"><i class=\"fa fa-2x fa-plus\"></i></button>\n" +
-    "            <ul class=\"dropdown-menu\" role=\"menu\">\n" +
-    "              <li><a href ng-click=\"openNewDir()\"><i class=\"fa fa-2x fa-folder-open-o fa-fw vmiddle\"></i> Directory</a></li>\n" +
-    "              <li><a href ng-click=\"openNewFile()\"><i class=\"fa fa-2x fa-file-o fa-fw vmiddle\"></i> File</a></li>\n" +
-    "              <li><a href ng-click=\"openNewUpload(path)\"><i class=\"fa fa-2x fa-cloud-upload fa-fw vmiddle\"></i> Upload</a></li>\n" +
-    "            </ul>\n" +
-    "          </div>\n" +
-    "    		</td>\n" +
-    "        <td>\n" +
-    "          <div id=\"crumbs\" class=\"collapse navbar-collapse\">\n" +
-    "            <ul>\n" +
-    "              <li ng-repeat=\"crumb in breadCrumbs\">\n" +
-    "                <a href=\"{{crumb.uri}}\"><i class=\"fa\" ng-class=\"$first?'fa-home':'fa-folder-open-o'\"></i> {{crumb.name}}</a>\n" +
-    "                </li>\n" +
-    "      			</ul>\n" +
-    "    	   	</div>\n" +
-    "    		</td>\n" +
-    "      </tr>\n" +
-    "    </table>\n" +
+    "  \n" +
+    "  <div ng-cloak class=\"col-md-12\" ng-show=\"listLocation === true\">  \n" +
     "    <div class=\"index\">\n" +
-    "			<table class=\"box-shadow\">\n" +
-    "				<thead>\n" +
-    "					<th class=\"filename\">Name</th>\n" +
-    "					<th>Size</th>\n" +
-    "					<th>Modified</th>\n" +
-    "					<th class=\"right\">More</th>\n" +
-    "				</thead>\n" +
+    "      <table class=\"box-shadow\">\n" +
+    "        <thead>\n" +
+    "            <th class=\"filename\">Name</th>\n" +
+    "            <th>Size</th>\n" +
+    "            <th>Modified</th>\n" +
+    "            <th class=\"right\">More</th>\n" +
+    "        </thead>\n" +
     "        <tr ng-show=\"emptyDir\">\n" +
     "          <td colspan=\"4\"><h2>No files found</h2></td>\n" +
     "        </tr>\n" +
-    "				<tr ng-repeat=\"res in resources|orderBy:['type','name'] track by res.id\">\n" +
-    "					<td colspan=\"{{res.type==='-'?4:1}}\"><a href=\"{{res.path}}\" target=\"{{res.type=='File'?'_blank':''}}\"><i class=\"fa fa-fw vmiddle\" ng-class=\"res.type=='Directory'||res.type==='-'?'fa-folder-open-o':'fa-file-o'\"></i> {{res.name}}</a></td>\n" +
-    "					<td ng-hide=\"res.type==='-'\">{{res.size|fileSize}}</td>\n" +
-    "					<td ng-hide=\"res.type==='-'\"><div tooltip-placement=\"bottom\" tooltip=\"{{res.mtime|classicDate}}\">{{res.mtime|fromNow}}</div></td>\n" +
-    "					<td ng-hide=\"res.type==='-'\" class=\"right\">\n" +
-    "						<div class=\"btn-group\" dropdown is-open=\"status.isopen\">\n" +
-    "                          <button type=\"button\" class=\"btn btn-primary dropdown-toggle\" ng-disabled=\"disabled\">\n" +
-    "                            <i class=\"fa fa-angle-double-down\"></i>\n" +
-    "                          </button>\n" +
-    "					      <ul class=\"dropdown-menu dropdown-menu-right left\" role=\"menu\">\n" +
-    "					        <!-- <li><a ng-show=\"res.type != 'Directory'\"><i class=\"fa fa-2x fa-pencil-square-o fa-fw vmiddle\"></i> View/Edit</a></li> -->\n" +
-    "					        <li><a ng-click=\"openACLEditor(res.uri, res.type)\"><i class=\"fa fa-2x fa-unlock-alt fa-fw vmiddle\"></i> Permissions</a></li>\n" +
-    "					        <li><a ng-click=\"openDelete(res.uri)\"><i class=\"fa fa-2x fa-trash-o fa-fw vmiddle\"></i> Delete</a></li>\n" +
-    "					      </ul>\n" +
-    "					    </div>\n" +
-    "					</td>\n" +
-    "				</tr>\n" +
-    "			</table>\n" +
-    "		</div>\n" +
-    "	</div>\n" +
+    "        <tr ng-repeat=\"res in resources|orderBy:['type','name'] track by res.id\">\n" +
+    "            <td colspan=\"{{res.type==='-'?3:1}}\">\n" +
+    "              <a href=\"{{res.path}}\" target=\"{{res.type=='File'?'_blank':''}}\"><i class=\"fa fa-fw vmiddle\" ng-class=\"res.type=='Directory'||res.type==='-'?'fa-folder-open-o':'fa-file-o'\"></i> {{res.name}}</a>\n" +
+    "            </td>\n" +
+    "            <td ng-hide=\"res.type==='-'\">{{res.size|fileSize}}</td>\n" +
+    "            <td ng-hide=\"res.type==='-'\"><div tooltip-placement=\"bottom\" tooltip=\"{{res.mtime|classicDate}}\">{{res.mtime|fromNow}}</div></td>\n" +
+    "            <td class=\"right\">\n" +
+    "                <div class=\"btn-group\" dropdown is-open=\"status.isopen\">\n" +
+    "                  <button type=\"button\" class=\"btn btn-primary dropdown-toggle\" ng-disabled=\"disabled\">\n" +
+    "                    <i class=\"fa fa-angle-double-down\"></i>\n" +
+    "                  </button>\n" +
+    "                  <ul class=\"dropdown-menu dropdown-menu-right left\" role=\"menu\">\n" +
+    "                    <!-- <li><a ng-show=\"res.type != 'Directory'\"><i class=\"fa fa-2x fa-pencil-square-o fa-fw vmiddle\"></i> View/Edit</a></li> -->\n" +
+    "                    <li><a ng-click=\"openACLEditor(res.uri, res.type)\"><i class=\"fa fa-2x fa-unlock-alt fa-fw vmiddle\"></i> Permissions</a></li>\n" +
+    "                    <li><a ng-click=\"openDelete(res.uri)\"><i class=\"fa fa-2x fa-trash-o fa-fw vmiddle\"></i> Delete</a></li>\n" +
+    "                  </ul>\n" +
+    "                </div>\n" +
+    "            </td>\n" +
+    "        </tr>\n" +
+    "      </table>\n" +
+    "    </div>\n" +
+    "  </div>\n" +
     "\n" +
     "  <!-- New dir modal -->\n" +
     "  <script type=\"text/ng-template\" id=\"newdir.html\">\n" +
@@ -195,7 +204,7 @@ angular.module("list/list.tpl.html", []).run(["$templateCache", function($templa
     "                  <i class=\"fa fa-2x fa-lock vmiddle\"></i>\n" +
     "                </div>\n" +
     "              </td>\n" +
-    "              <td class=\"vtop\">\n" +
+    "              <td class=\"vtop policies\">\n" +
     "                <div class=\"policy\" ng-hide=\"gotOwner\">\n" +
     "                  <h3 class=\"orange\">Attention!</h3>\n" +
     "                  You will not be able to update this policy in the future if you do not set at least one owner. Click the button below to add an owner.\n" +
@@ -204,13 +213,13 @@ angular.module("list/list.tpl.html", []).run(["$templateCache", function($templa
     "                  <div class=\"pull-left\">\n" +
     "                    <img ng-src=\"assets/loading.gif\" ng-show=\"policy.loading\" />\n" +
     "                    <button class=\"btn btn-sm\" ng-click=\"removeUser(policy.uri, policy.webid)\" ng-hide=\"policy.loading\"><i class=\"fa fa-trash-o orange\"></i></button>\n" +
-    "                    <a href=\"{{policy.webid}}\" target=\"_blank\">{{trunc(policy.fullname, 25)}}</a>\n" +
+    "                    <a href=\"{{policy.webid}}\" target=\"_blank\">{{trunc(policy.fullname, 35)}}</a>\n" +
     "                  </div>\n" +
     "                  <br/>\n" +
     "                </div>\n" +
     "                <div class=\"spacer\">\n" +
     "                  <div class=\"policy\" ng-show=\"newUser['owner']\">\n" +
-    "                    <input class=\"new-user\" type=\"text\" ng-model=\"newUser['owner'].webid\" typeahead=\"match.webid as match.name for match in lookupWebID($viewValue)|filter:{name:$viewValue}|limitTo:8\" typeahead-loading=\"searchloading\" typeahead-min-length=\"2\" typeahead-wait-ms=\"200\" typeahead-on-select=\"addNewUser('owner', $item.webid)\"/>\n" +
+    "                    <input class=\"new-user\" type=\"text\" ng-focus=\"isFocused\" ng-model=\"newUser['owner'].webid\" typeahead=\"match.webid as match.name for match in lookupWebID($viewValue)|filter:{name:$viewValue}|limitTo:8\" typeahead-loading=\"searchloading\" typeahead-min-length=\"2\" typeahead-wait-ms=\"200\" typeahead-on-select=\"addNewUser('owner', $item.webid)\"/>\n" +
     "                    <img ng-src=\"assets/loading.gif\" ng-show=\"searchloading\" />\n" +
     "                    <button class=\"btn btn-sm btn-primary\" ng-click=\"addNewUser('owner', newUser['owner'].webid)\"><i class=\"fa fa-plus\"></i></button>\n" +
     "                    <button class=\"btn btn-sm\" ng-click=\"cancelNewUser('owner')\">Cancel</button>\n" +
@@ -224,71 +233,34 @@ angular.module("list/list.tpl.html", []).run(["$templateCache", function($templa
     "            <tr>\n" +
     "              <td class=\"pull-left\">\n" +
     "                <div class=\"permission-icons\">\n" +
-    "                  <strong>Users</strong>\n" +
-    "                  <br/>\n" +
-    "                  <i class=\"fa fa-2x fa-user vmiddle\"></i>\n" +
-    "                </div>\n" +
-    "              </td>\n" +
-    "              <td class=\"vtop\">\n" +
-    "                <div class=\"policy\" ng-repeat=\"policy in policies|filter:{cat: 'user'}\">\n" +
-    "                  <div class=\"pull-left\">\n" +
-    "                    <img ng-src=\"assets/loading.gif\" ng-show=\"policy.loading\" />\n" +
-    "                    <button class=\"btn btn-sm\" ng-click=\"removeUser(policy.uri, policy.webid)\" ng-hide=\"policy.loading\"><i class=\"fa fa-trash-o orange\"></i></button>\n" +
-    "                    <a href=\"{{policy.webid}}\" target=\"_blank\">{{trunc(policy.fullname, 25)}}</a>\n" +
-    "                  </div>\n" +
-    "                  <div class=\"boxes pull-right\">\n" +
-    "                      <input type=\"checkbox\" ng-model=\"policy.modes.Read\"/><div class=\"mode-label\">Read</div>\n" +
-    "                      <input type=\"checkbox\" ng-model=\"policy.modes.Write\"/><div class=\"mode-label\">Write</div>\n" +
-    "                      <input type=\"checkbox\" ng-model=\"policy.modes.Append\"/><div class=\"mode-label\" tooltip-placement=\"bottom\" tooltip=\"Able to write without reading or deleting.\">Append</div>\n" +
-    "                      <input type=\"checkbox\" ng-model=\"policy.defaultForNew\" ng-show=\"resType == 'Directory'\"/><div class=\"mode-label\" tooltip-placement=\"bottom\" tooltip=\"Applies to all resources within this directory.\" ng-show=\"resType == 'Directory'\">Recursive</div>\n" +
-    "                  </div>\n" +
-    "                  <br/>\n" +
-    "                </div>\n" +
-    "                <div class=\"spacer\">\n" +
-    "                  <div class=\"policy\" ng-show=\"newUser['user']\">\n" +
-    "                    <input class=\"new-user\" type=\"text\" ng-model=\"newUser['user'].webid\" typeahead=\"match.webid as match.name for match in lookupWebID($viewValue)|filter:{name:$viewValue}|limitTo:8\" typeahead-loading=\"searchloading\" typeahead-min-length=\"2\" typeahead-wait-ms=\"200\" typeahead-on-select=\"addNewUser('user', $item.webid)\"/>\n" +
-    "                    <img ng-src=\"assets/loading.gif\" ng-show=\"searchloading\" />\n" +
-    "                    <button class=\"btn btn-sm btn-primary\" ng-click=\"addNewUser('user', newUser['user'].webid)\"><i class=\"fa fa-plus\"></i></button>\n" +
-    "                    <button class=\"btn btn-sm\" ng-click=\"cancelNewUser('user')\">Cancel</button>\n" +
-    "                    <br/>\n" +
-    "                  </div>\n" +
-    "                  <button class=\"btn btn-primary\" ng-click=\"showNewUser('user')\">Add</button>\n" +
-    "                </div>\n" +
-    "              </td>\n" +
-    "            </tr>\n" +
-    "            <tr><td colspan=\"2\"><hr/></td></tr>\n" +
-    "            <tr>\n" +
-    "              <td class=\"pull-left\">\n" +
-    "                <div class=\"permission-icons\">\n" +
-    "                  <strong>Groups</strong>\n" +
+    "                  <strong>Others</strong>\n" +
     "                  <br/>\n" +
     "                  <i class=\"fa fa-2x fa-users vmiddle\"></i>\n" +
     "                </div>\n" +
     "              </td>\n" +
-    "              <td class=\"vtop\">\n" +
-    "                <div class=\"policy\" ng-repeat=\"policy in policies|filter:{cat: 'group'}\">\n" +
+    "              <td class=\"vtop policies\">\n" +
+    "                <div class=\"policy\" ng-repeat=\"policy in policies|filter:{cat: 'others'}\">\n" +
     "                  <div class=\"pull-left\">\n" +
     "                    <img ng-src=\"assets/loading.gif\" ng-show=\"policy.loading\" />\n" +
     "                    <button class=\"btn btn-sm\" ng-click=\"removeUser(policy.uri, policy.webid)\" ng-hide=\"policy.loading\"><i class=\"fa fa-trash-o orange\"></i></button>\n" +
-    "                    <a href=\"{{policy.webid}}\" target=\"_blank\">{{trunc(policy.fullname, 25)}}</a>\n" +
+    "                    <a href=\"{{policy.webid}}\" target=\"_blank\">{{trunc(policy.fullname, 35)}}</a>\n" +
     "                  </div>\n" +
     "                  <div class=\"boxes pull-right\">\n" +
     "                      <input type=\"checkbox\" ng-model=\"policy.modes.Read\"/><div class=\"mode-label\">Read</div>\n" +
     "                      <input type=\"checkbox\" ng-model=\"policy.modes.Write\"/><div class=\"mode-label\">Write</div>\n" +
     "                      <input type=\"checkbox\" ng-model=\"policy.modes.Append\"/><div class=\"mode-label\" tooltip-placement=\"bottom\" tooltip=\"Able to write without reading or deleting.\">Append</div>\n" +
-    "                      <input type=\"checkbox\" ng-model=\"policy.defaultForNew\" ng-show=\"resType == 'Directory'\"/><div class=\"mode-label\" tooltip-placement=\"bottom\" tooltip=\"Applies to all resources within this directory.\" ng-show=\"resType == 'Directory'\">Recursive</div>\n" +
     "                  </div>\n" +
     "                  <br/>\n" +
     "                </div>\n" +
     "                <div class=\"spacer\">\n" +
-    "                  <div class=\"policy\" ng-show=\"newUser['group']\">\n" +
-    "                    <input class=\"new-user\" type=\"text\" ng-model=\"newUser['group'].webid\" typeahead=\"match.webid as match.name for match in lookupWebID($viewValue)|filter:{name:$viewValue}|limitTo:8\" typeahead-loading=\"searchloading\" typeahead-min-length=\"2\" typeahead-wait-ms=\"200\" typeahead-on-select=\"addNewUser('group', $item.webid)\"/>\n" +
+    "                  <div class=\"policy\" ng-show=\"newUser['others']\">\n" +
+    "                    <input class=\"new-user\" type=\"text\" ng-focus=\"isFocused\" ng-model=\"newUser['others'].webid\" typeahead=\"match.webid as match.name for match in lookupWebID($viewValue)|filter:{name:$viewValue}|limitTo:8\" typeahead-loading=\"searchloading\" typeahead-min-length=\"2\" typeahead-wait-ms=\"200\" typeahead-on-select=\"addNewUser('others', $item.webid)\"/>\n" +
     "                    <img ng-src=\"assets/loading.gif\" ng-show=\"searchloading\" />\n" +
-    "                    <button class=\"btn btn-sm btn-primary\" ng-click=\"addNewUser('group', newUser['group'].webid)\"><i class=\"fa fa-plus\"></i></button>\n" +
-    "                    <button class=\"btn btn-sm\" ng-click=\"cancelNewUser('group')\">Cancel</button>\n" +
+    "                    <button class=\"btn btn-sm btn-primary\" ng-click=\"addNewUser('others', newUser['others'].webid)\"><i class=\"fa fa-plus\"></i></button>\n" +
+    "                    <button class=\"btn btn-sm\" ng-click=\"cancelNewUser('others')\">Cancel</button>\n" +
     "                    <br/>\n" +
     "                  </div>\n" +
-    "                  <button class=\"btn btn-primary\" ng-click=\"showNewUser('group')\">Add</button>\n" +
+    "                  <button class=\"btn btn-primary\" ng-click=\"showNewUser('others')\">Add</button>\n" +
     "                </div>\n" +
     "              </td>\n" +
     "            </tr>\n" +
@@ -296,21 +268,17 @@ angular.module("list/list.tpl.html", []).run(["$templateCache", function($templa
     "            <tr>\n" +
     "              <td class=\"pull-left\">\n" +
     "                <div class=\"permission-icons\">\n" +
-    "                  <strong>Others</strong>\n" +
+    "                  <strong>Everyone</strong>\n" +
     "                  <br/>\n" +
     "                  <i class=\"fa fa-2x fa-unlock-alt vmiddle\"></i>\n" +
     "                </div>\n" +
     "              </td>\n" +
-    "              <td class=\"vtop\">\n" +
-    "                <div ng-repeat=\"policy in policies|filter:{cat: 'other'}|limitTo:1\">\n" +
+    "              <td class=\"vtop policies\">\n" +
+    "                <div ng-repeat=\"policy in policies|filter:{cat: 'any'}|limitTo:1\">\n" +
     "                  <div class=\"pull-left\">\n" +
-    "                   Everyone\n" +
-    "                  </div>\n" +
-    "                  <div class=\"boxes pull-right\">\n" +
     "                      <input type=\"checkbox\" ng-model=\"policy.modes.Read\"/><div class=\"mode-label\">Read</div>\n" +
     "                      <input type=\"checkbox\" ng-model=\"policy.modes.Write\"/><div class=\"mode-label\">Write</div>\n" +
     "                      <input type=\"checkbox\" ng-model=\"policy.modes.Append\"/><div class=\"mode-label\" tooltip-placement=\"bottom\" tooltip=\"Able to write without reading or deleting.\">Append</div>\n" +
-    "                      <input type=\"checkbox\" ng-model=\"policy.defaultForNew\" ng-show=\"resType == 'Directory'\"/><div class=\"mode-label\" tooltip-placement=\"bottom\" tooltip=\"Applies to all resources within this directory.\" ng-show=\"resType == 'Directory'\">Recursive</div>\n" +
     "                  </div>\n" +
     "                </div>\n" +
     "              </td>\n" +
@@ -330,32 +298,6 @@ angular.module("list/list.tpl.html", []).run(["$templateCache", function($templa
     "    </a>\n" +
     "  </script>\n" +
     "  \n" +
-    "</div>\n" +
-    "");
-}]);
-
-angular.module("login/login.tpl.html", []).run(["$templateCache", function($templateCache) {
-  $templateCache.put("login/login.tpl.html",
-    "<div ng-click=\"hideMenu()\">\n" +
-    "  <div class=\"panel-body col-md-12\">\n" +
-    "    <div class=\"panel-body\">\n" +
-    "        <h2>Welcome to LDP File Manager!</h2>\n" +
-    "        <div ng-hide=\"loginSuccess\">\n" +
-    "          <h3>Please authenticated in order for us to find your files.</h3>\n" +
-    "          <p ng-hide=\"showLogin\"><button class=\"btn btn-primary btn-sep-right\" ng-click=\"showLogin=!showLogin\">Login</button></p>\n" +
-    "        </div>\n" +
-    "  </div>\n" +
-    "\n" +
-    "  <!--login screen -->\n" +
-    "  <div ng-show=\"showLogin\">\n" +
-    "    <div class=\"login-frame\">\n" +
-    "      <h2>Login / Sign Up</h2>\n" +
-    "\n" +
-    "      <iframe ng-src=\"{{signupWidget}}\" sandbox=\"allow-same-origin allow-scripts allow-forms\" frameborder=\"0\"></iframe>\n" +
-    "\n" +
-    "    </div>\n" +
-    "  </div>\n" +
-    "\n" +
     "</div>\n" +
     "");
 }]);

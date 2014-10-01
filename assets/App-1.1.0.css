@@ -1477,7 +1477,8 @@ caption {
 }
 .create-new {
   position: relative;
-  top: 25px;
+  top: 5px;
+  left: 10px;
 }
 .create-new button {
   width: 50px;
@@ -1491,6 +1492,10 @@ caption {
   display: block;
   padding-bottom: 15px;
 }
+.policies {
+  width: 100%;
+  padding-left: 10px;
+}
 .permission-icons {
   min-height: 50px;
   min-width: 70px;
@@ -1498,7 +1503,7 @@ caption {
   text-align: center;
 }
 .boxes {
-  width: 60%;
+  width: 45%;
   display: inline-flex;
 }
 .new-user {
@@ -1609,7 +1614,7 @@ caption {
   margin: 0 5px 0 0;
   font-size: 20px;
   text-decoration: none;
-  color: #fff;
+  color: #000;
 }
 #crumbs ul li a:after {
   content: "";
@@ -1650,11 +1655,6 @@ caption {
 }
 #crumbs ul li a:hover:after {
   border-left-color: #ff3c1f;
-}
-
-.login-frame iframe {
-  min-height: 400px;
-  min-width: 380px;
 }
 
 /**
@@ -7503,8 +7503,10 @@ h2 {
 }
 .topbar {
   position: fixed;
+  padding-left: 10px;
   padding-right: 10px;
   top: 0px;
+  left: 0px;
   height: 70px;
   width: 100%;
   background: #000;

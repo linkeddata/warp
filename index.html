@@ -32,89 +32,18 @@
     <script type="text/javascript" src="src/app/about/about.js"></script>
     <script type="text/javascript" src="src/app/app.js"></script>
     <script type="text/javascript" src="src/app/list/list.js"></script>
-    <script type="text/javascript" src="src/app/login/login.js"></script>
     <script type="text/javascript" src="src/assets/common.js"></script>
     <script type="text/javascript" src="templates-common.js"></script>
     <script type="text/javascript" src="templates-app.js"></script>
   </head>
   <body flow-prevent-drop ng-cloak>
-      <div class="topbar box-shadow">
-        <div class="pull-right white"><h1><i class="fa fa-rocket orange"></i> WARP</h1></div>
-      </div>
-
-    <div ng-class="showMenu?'slide-out':''" class="sidebar left-menu">
-      <button type="button" ng-click="showMenu=!showMenu" class="btn btn-primary icon-bars-button" ng-class="showMenu==true?'icon-bars-button-right':'icon-bars-button-left'" alt="Toggle navigation">
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-      </button>
-
-      <div ng-click="showMenu=false">
-        <div ng-show="userProfile.webid" class="menu-item avatar-frame">
-          <a href="{{userProfile.webid}}" target="_blank" ui-sref="profile">
-            <img ng-src="{{userProfile.picture}}" class="profile-img" title="{{userProfile.name}}" alt="{{userProfile.name}}" />
-          </a>
-        </div>
-
-        <i ng-show="userProfile.webid" class="fa fa-ellipsis-h fa-2x light-grey"></i>
-        
-        <div ng-show="userProfile.webid" class="menu-item">
-          <a href ng-click="myList()">
-            <div>
-              <i class="fa fa-th-list fa-3x"></i>
-              <p>My files</p>
-            </div>
-          </a>
-          <i class="fa fa-ellipsis-h fa-2x light-grey"></i>
-        </div>
-        
-        <div class="menu-item">
-          <a href="#/list/">
-            <div class="settings">
-              <i class="fa fa-search fa-3x"></i>
-              <p>Lookup</p>
-            </div>
-          </a>
-          <i class="fa fa-ellipsis-h fa-2x light-grey"></i>
-        </div>
-        
-        <div class="menu-item" tooltip-placement="bottom" tooltip="{{notifEnabledTxt}}" ng-hide="checkNotif() === 'granted'">
-          <a href ng-click="authorizeNotifications()">
-            <div>
-              <i class="fa fa-bullhorn fa-3x" ng-class="notifStatus=='granted'?'orange':''"></i>
-              <p>Notifications</p>
-            </div>
-          </a>
-          <i class="fa fa-ellipsis-h fa-2x light-grey"></i>
-        </div>
-
-        <div ng-show="userProfile.webid" class="">
-          <a href ng-click="logout()">
-            <div class="logout menu-item">
-              <i class="fa fa-power-off fa-3x orange"></i>
-              <p>Logout</p>
-            </div>
-          </a>
-        </div>
-      </div>
-
-      <div ng-hide="userProfile.webid" ng-click="showMenu=false">
-        <a href ng-click="login()">
-          <div class="menu-item">
-            <i class="fa fa-power-off fa-3x"></i>
-            <p>Login</p>
-          </div>
-        </a>
-      </div>
-    </div>
-
     <div ui-view="main" class="main"></div>
 
     <footer class="footer">
       <div class="container">
         <div class="footer-inner">
           <p>
-            &copy; 2014 Warp | <a href="https://github.com/linkeddata/warp"><i class="fa fa-github"></i> Source</a> | <a href="https://github.com/linkeddata/warp/issues"><i class="fa fa-bug"></i> Issues</a>
+            &copy; 2014 <i class="fa fa-rocket orange"></i> Warp | <a href="https://github.com/linkeddata/warp"><i class="fa fa-github"></i> Source</a> | <a href="https://github.com/linkeddata/warp/issues"><i class="fa fa-bug"></i> Issues</a>
           </p>
         </div>
       </div>

@@ -20,6 +20,7 @@ var getProfile = function(scope, uri, profile) {
       scope.$apply();
       return false;
     } else {
+      var classType = (g.any(webidRes, RDF('type')).value == FOAF('Group').value)?'agentClass':'agent';
       // get some basic info
       var name = g.any(webidRes, FOAF('name'));
       // Clean up name
@@ -37,10 +38,11 @@ var getProfile = function(scope, uri, profile) {
         }
       }
 
+      profile.classtype = classType;
       profile.fullname = name;
       profile.picture = pic;
       profile.loading = false;
-      
+
       scope.$apply();
       return true;
     }
