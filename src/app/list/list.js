@@ -363,9 +363,9 @@ angular.module( 'App.list', [
     }).
     error(function(data, status) {
       if (status == 401) {
-        notify('Forbidden', 'Authentication required to delete resource.');
+        notify('Forbidden', 'Authentication required to delete '+basename(resourceUri));
       } else if (status == 403) {
-        notify('Forbidden', 'You are not allowed to delete resource.');
+        notify('Forbidden', 'You are not allowed to delete '+basename(resourceUri));
       } else if (status == 409) {
         notify('Failed', 'Conflict detected. In case of directory, check if not empty.');
       } else {
@@ -794,7 +794,7 @@ var ModalACLEditor = function ($scope, $modalInstance, $http, uri, aclURI, type,
         }
       };
 
-      var policies = g.statementsMatching(undefined, RDF("type"), WAC("Authorization"));
+      var policies = g.statementsMatching(undefined, WAC("accessTo"), $rdf.sym($scope.uri));
       if (policies.length > 0) {
         $scope.getPolicies(g.statementsMatching(undefined, WAC("agent"), undefined), 'others', $scope.policies);
         $scope.getPolicies(g.statementsMatching(undefined, WAC("agentClass"), undefined), 'others', $scope.policies);
