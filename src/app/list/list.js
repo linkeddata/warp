@@ -16,7 +16,6 @@
 angular.module( 'App.list', [
   'ui.router',  
   'ngProgress',
-  'ngAnimate',
   'ui.bootstrap',
   'ui.bootstrap.tpls',
   'angularFileUpload'

@@ -67,9 +67,6 @@ caption {
   text-align: left;
   background: #fff;
   border-top: 1px dotted #ddd;
-  -webkit-transition: all 2s 1.5s ease-out;
-  -moz-transition: all 1.5s ease-out;
-  transition: all 1.5s ease-out;
 }
 .index thead > tr {
   border-top: 1px solid #ddd;
@@ -203,22 +200,27 @@ caption {
   color: white;
 }
 /*  ng-repeat Animation  */
+/*
 .repeat-animation.ng-enter {
   -webkit-transition: all linear 1s;
   -moz-transition: all linear 1s;
   -o-transition: all linear 1s;
   transition: all linear 1s;
-  position: relative;
-  left: 5px;
+    
+  position:relative;
+  left:5px;
 }
+
 .repeat-animation.ng-leave {
-  -webkit-transition: all linear 1s;
+	-webkit-transition: all linear 1s;
   -moz-transition: all linear 1s;
   -o-transition: all linear 1s;
   transition: all linear 1s;
-  position: relative;
-  left: 5px;
+    
+  position:relative;
+  left:5px;
 }
+
 .repeat-animation.ng-enter {
   opacity: 0;
 }
@@ -226,37 +228,28 @@ caption {
   opacity: 1;
 }
 .repeat-animation.ng-leave {
-  display: none;
+	display: none;
   opacity: 1;
 }
 .repeat-animation.ng-leave.ng-leave-active {
   display: none;
   opacity: 0;
 }
-.repeat-enter-setup,
-.repeat-leave-setup {
-  -webkit-transition: all linear 0.5s;
-  -moz-transition: all linear 0.5s;
-  -ms-transition: all linear 0.5s;
-  -o-transition: all linear 0.5s;
-  transition: all linear 0.5s;
+
+.repeat-enter-setup, .repeat-leave-setup {
+  -webkit-transition:all linear 0.5s;
+  -moz-transition:all linear 0.5s;
+  -ms-transition:all linear 0.5s;
+  -o-transition:all linear 0.5s;
+  transition:all linear 0.5s;
 }
-.repeat-enter-setup {
-  line-height: 0;
-  opacity: 0;
-}
-.repeat-enter-setup.repeat-enter-start {
-  line-height: 20px;
-  opacity: 1;
-}
-.repeat-leave-setup {
-  opacity: 1;
-  line-height: 20px;
-}
-.repeat-leave-setup.repeat-leave-start {
-  opacity: 0;
-  line-height: 0;
-}
+
+.repeat-enter-setup { line-height:0; opacity:0; }
+.repeat-enter-setup.repeat-enter-start { line-height:20px; opacity:1; }
+
+.repeat-leave-setup { opacity:1; line-height:20px; }
+.repeat-leave-setup.repeat-leave-start { opacity:0; line-height:0; }
+*/
 #crumbs {
   position: relative;
   text-align: left;
