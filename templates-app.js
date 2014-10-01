@@ -17,7 +17,7 @@ angular.module("list/list.tpl.html", []).run(["$templateCache", function($templa
     "    <div>\n" +
     "      <table class=\"create-new\">\n" +
     "      <tr>\n" +
-    "        <td>\n" +
+    "        <td class=\"vtop\">\n" +
     "          <div class=\"btn-group\" dropdown>\n" +
     "            <button type=\"button\" class=\"btn btn-success dropdown-toggle\" ng-disabled=\"disabled\" tooltip-placement=\"bottom\" tooltip=\"New...\"><i class=\"fa fa-2x fa-plus\"></i></button>\n" +
     "            <ul class=\"dropdown-menu\" role=\"menu\">\n" +

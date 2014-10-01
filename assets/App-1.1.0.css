@@ -1477,7 +1477,7 @@ caption {
 }
 .create-new {
   position: relative;
-  top: 5px;
+  top: 10px;
   left: 10px;
 }
 .create-new button {
@@ -1592,7 +1592,6 @@ caption {
 #crumbs {
   position: relative;
   text-align: left;
-  top: 5px;
   left: 10px;
 }
 #crumbs ul {
