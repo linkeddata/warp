@@ -113,8 +113,12 @@ angular.module( 'App.list', [
       $location.path('/list/'+stripSchema(url));
     } else {
       $scope.listLocation = false;
-      notify('Warning', 'Please provide a URL');
+      notify('Warning', 'Please provide a valid URL');
     }
+  };
+  
+  $scope.changeLocation = function(path) {
+    $location.path(path);
   };
 
   // TODO: rdflib fetch does not respond properly to 404

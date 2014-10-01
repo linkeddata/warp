@@ -11,7 +11,7 @@ angular.module("about/about.tpl.html", []).run(["$templateCache", function($temp
 
 angular.module("list/list.tpl.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("list/list.tpl.html",
-    "<div class=\"container\">\n" +
+    "<div>\n" +
     "  <div class=\"topbar box-shadow\" ng-show=\"path\">\n" +
     "    <div class=\"pull-left white vmiddle\" ng-hide=\"notifStatus=='granted'\"><h1><button ng-click=\"authorizeNotifications()\" class=\"btn btn-primary\"><i class=\"fa fa-bullhorn fa-2x white vmiddle\" ng-class=\"notifStatus=='granted'?'orange':''\"></i> Enable notifications</button></h1></div>\n" +
     "    <div>\n" +
@@ -26,6 +26,9 @@ angular.module("list/list.tpl.html", []).run(["$templateCache", function($templa
     "              <li><a href ng-click=\"openNewUpload(path)\"><i class=\"fa fa-2x fa-cloud-upload fa-fw vmiddle\"></i> Upload</a></li>\n" +
     "            </ul>\n" +
     "          </div>\n" +
+    "        </td>\n" +
+    "        <td class=\"vtop\">\n" +
+    "          <button type=\"button\" class=\"btn btn-info\" tooltip-placement=\"bottom\" tooltip=\"Pick a different storage location\" ng-click=\"changeLocation('/list/')\"><i class=\"fa fa-2x fa-database white\"></i></button>\n" +
     "        </td>\n" +
     "        <td>\n" +
     "          <div id=\"crumbs\" class=\"collapse navbar-collapse\">\n" +
@@ -54,39 +57,37 @@ angular.module("list/list.tpl.html", []).run(["$templateCache", function($templa
     "    </div>\n" +
     "  </div>\n" +
     "  \n" +
-    "  <div ng-cloak class=\"col-md-12\" ng-show=\"listLocation === true\">  \n" +
-    "    <div class=\"index\">\n" +
-    "      <table class=\"box-shadow\">\n" +
-    "        <thead>\n" +
-    "            <th class=\"filename\">Name</th>\n" +
-    "            <th>Size</th>\n" +
-    "            <th>Modified</th>\n" +
-    "            <th class=\"right\">More</th>\n" +
-    "        </thead>\n" +
-    "        <tr ng-show=\"emptyDir\">\n" +
-    "          <td colspan=\"4\"><h2>No files found</h2></td>\n" +
-    "        </tr>\n" +
-    "        <tr ng-repeat=\"res in resources|orderBy:['type','name'] track by res.id\">\n" +
-    "            <td colspan=\"{{res.type==='-'?3:1}}\">\n" +
-    "              <a href=\"{{res.path}}\" target=\"{{res.type=='File'?'_blank':''}}\"><i class=\"fa fa-fw vmiddle\" ng-class=\"res.type=='Directory'||res.type==='-'?'fa-folder-open-o':'fa-file-o'\"></i> {{res.name}}</a>\n" +
-    "            </td>\n" +
-    "            <td ng-hide=\"res.type==='-'\">{{res.size|fileSize}}</td>\n" +
-    "            <td ng-hide=\"res.type==='-'\"><div tooltip-placement=\"bottom\" tooltip=\"{{res.mtime|classicDate}}\">{{res.mtime|fromNow}}</div></td>\n" +
-    "            <td class=\"right\">\n" +
-    "                <div class=\"btn-group\" dropdown is-open=\"status.isopen\">\n" +
-    "                  <button type=\"button\" class=\"btn btn-primary dropdown-toggle\" ng-disabled=\"disabled\">\n" +
-    "                    <i class=\"fa fa-angle-double-down\"></i>\n" +
-    "                  </button>\n" +
-    "                  <ul class=\"dropdown-menu dropdown-menu-right left\" role=\"menu\">\n" +
-    "                    <!-- <li><a ng-show=\"res.type != 'Directory'\"><i class=\"fa fa-2x fa-pencil-square-o fa-fw vmiddle\"></i> View/Edit</a></li> -->\n" +
-    "                    <li><a ng-click=\"openACLEditor(res.uri, res.type)\"><i class=\"fa fa-2x fa-unlock-alt fa-fw vmiddle\"></i> Permissions</a></li>\n" +
-    "                    <li><a ng-click=\"openDelete(res.uri)\"><i class=\"fa fa-2x fa-trash-o fa-fw vmiddle\"></i> Delete</a></li>\n" +
-    "                  </ul>\n" +
-    "                </div>\n" +
-    "            </td>\n" +
-    "        </tr>\n" +
-    "      </table>\n" +
-    "    </div>\n" +
+    "  <div class=\"index\" ng-show=\"listLocation === true\">\n" +
+    "    <table class=\"box-shadow\">\n" +
+    "      <thead>\n" +
+    "          <th class=\"filename\">Name</th>\n" +
+    "          <th>Size</th>\n" +
+    "          <th>Modified</th>\n" +
+    "          <th class=\"right\">More</th>\n" +
+    "      </thead>\n" +
+    "      <tr ng-show=\"emptyDir\">\n" +
+    "        <td colspan=\"4\"><h2>No files found</h2></td>\n" +
+    "      </tr>\n" +
+    "      <tr ng-repeat=\"res in resources|orderBy:['type','name'] track by res.id\">\n" +
+    "          <td colspan=\"{{res.type==='-'?3:1}}\">\n" +
+    "            <a href=\"{{res.path}}\" target=\"{{res.type=='File'?'_blank':''}}\"><i class=\"fa fa-fw vmiddle\" ng-class=\"res.type=='Directory'||res.type==='-'?'fa-folder-open-o':'fa-file-o'\"></i> {{res.name}}</a>\n" +
+    "          </td>\n" +
+    "          <td ng-hide=\"res.type==='-'\">{{res.size|fileSize}}</td>\n" +
+    "          <td ng-hide=\"res.type==='-'\"><div tooltip-placement=\"bottom\" tooltip=\"{{res.mtime|classicDate}}\">{{res.mtime|fromNow}}</div></td>\n" +
+    "          <td class=\"right\">\n" +
+    "              <div class=\"btn-group\" dropdown is-open=\"status.isopen\">\n" +
+    "                <button type=\"button\" class=\"btn btn-primary dropdown-toggle\" ng-disabled=\"disabled\">\n" +
+    "                  <i class=\"fa fa-angle-double-down\"></i>\n" +
+    "                </button>\n" +
+    "                <ul class=\"dropdown-menu dropdown-menu-right left\" role=\"menu\">\n" +
+    "                  <!-- <li><a ng-show=\"res.type != 'Directory'\"><i class=\"fa fa-2x fa-pencil-square-o fa-fw vmiddle\"></i> View/Edit</a></li> -->\n" +
+    "                  <li><a ng-click=\"openACLEditor(res.uri, res.type)\"><i class=\"fa fa-2x fa-unlock-alt fa-fw vmiddle\"></i> Permissions</a></li>\n" +
+    "                  <li><a ng-click=\"openDelete(res.uri)\"><i class=\"fa fa-2x fa-trash-o fa-fw vmiddle\"></i> Delete</a></li>\n" +
+    "                </ul>\n" +
+    "              </div>\n" +
+    "          </td>\n" +
+    "      </tr>\n" +
+    "    </table>\n" +
     "  </div>\n" +
     "\n" +
     "  <!-- New dir modal -->\n" +
@@ -105,7 +106,7 @@ angular.module("list/list.tpl.html", []).run(["$templateCache", function($templa
     "        </div>\n" +
     "        <div class=\"modal-footer\">\n" +
     "          <button class=\"btn btn-primary\" ng-click=\"newDir(dirName)\">OK</button>\n" +
-    "          <button class=\"btn btn-warning\" ng-click=\"cancel()\">Cancel</button>\n" +
+    "          <button class=\"btn btn-default\" ng-click=\"cancel()\">Cancel</button>\n" +
     "        </div>\n" +
     "    </div>\n" +
     "  </script>\n" +
@@ -127,7 +128,7 @@ angular.module("list/list.tpl.html", []).run(["$templateCache", function($templa
     "        </div>\n" +
     "        <div class=\"modal-footer\">\n" +
     "          <button class=\"btn btn-primary\" ng-click=\"newFile(fileName)\">OK</button>\n" +
-    "          <button class=\"btn btn-warning\" ng-click=\"cancel()\">Cancel</button>\n" +
+    "          <button class=\"btn btn-default\" ng-click=\"cancel()\">Cancel</button>\n" +
     "        </div>\n" +
     "    </div>\n" +
     "  </script>\n" +
@@ -182,7 +183,7 @@ angular.module("list/list.tpl.html", []).run(["$templateCache", function($templa
     "        </div>\n" +
     "        <div class=\"modal-footer\">\n" +
     "          <button class=\"btn btn-primary\" ng-click=\"deleteResource(resource)\">Yes</button>\n" +
-    "          <button class=\"btn btn-warning\" ng-click=\"cancel()\">Cancel</button>\n" +
+    "          <button class=\"btn btn-default\" ng-click=\"cancel()\">Cancel</button>\n" +
     "        </div>\n" +
     "    </div>\n" +
     "  </script>\n" +
@@ -219,13 +220,13 @@ angular.module("list/list.tpl.html", []).run(["$templateCache", function($templa
     "                </div>\n" +
     "                <div class=\"spacer\">\n" +
     "                  <div class=\"policy\" ng-show=\"newUser['owner']\">\n" +
-    "                    <input class=\"new-user\" type=\"text\" ng-focus=\"isFocused\" ng-model=\"newUser['owner'].webid\" typeahead=\"match.webid as match.name for match in lookupWebID($viewValue)|filter:{name:$viewValue}|limitTo:8\" typeahead-loading=\"searchloading\" typeahead-min-length=\"2\" typeahead-wait-ms=\"200\" typeahead-on-select=\"addNewUser('owner', $item.webid)\"/>\n" +
+    "                    <input class=\"new-user vmiddle\" type=\"text\" ng-focus=\"isFocused\" ng-model=\"newUser['owner'].webid\" typeahead=\"match.webid as match.name for match in lookupWebID($viewValue)|filter:{name:$viewValue}|limitTo:8\" typeahead-loading=\"searchloading\" typeahead-min-length=\"2\" typeahead-wait-ms=\"200\" typeahead-on-select=\"addNewUser('owner', $item.webid)\"/>\n" +
     "                    <img ng-src=\"assets/loading.gif\" ng-show=\"searchloading\" />\n" +
-    "                    <button class=\"btn btn-sm btn-primary\" ng-click=\"addNewUser('owner', newUser['owner'].webid)\"><i class=\"fa fa-plus\"></i></button>\n" +
-    "                    <button class=\"btn btn-sm\" ng-click=\"cancelNewUser('owner')\">Cancel</button>\n" +
+    "                    <button class=\"btn btn-sm btn-primary\" ng-click=\"addNewUser('owner', newUser['owner'].webid)\"><i class=\"fa fa-2x fa-check-circle-o\"></i></button>\n" +
+    "                    <button class=\"btn btn-sm\" ng-click=\"cancelNewUser('owner')\"><i class=\"fa fa-2x fa-times-circle-o\"></i></button>\n" +
     "                    <br/>\n" +
     "                  </div>\n" +
-    "                  <button class=\"btn btn-primary\" ng-click=\"showNewUser('owner')\">Add</button>\n" +
+    "                  <button class=\"btn btn-primary\" ng-click=\"showNewUser('owner')\" ng-hide=\"newUser['owner']\">Add</button>\n" +
     "                </div>\n" +
     "              </td>\n" +
     "            </tr>\n" +
@@ -254,13 +255,13 @@ angular.module("list/list.tpl.html", []).run(["$templateCache", function($templa
     "                </div>\n" +
     "                <div class=\"spacer\">\n" +
     "                  <div class=\"policy\" ng-show=\"newUser['others']\">\n" +
-    "                    <input class=\"new-user\" type=\"text\" ng-focus=\"isFocused\" ng-model=\"newUser['others'].webid\" typeahead=\"match.webid as match.name for match in lookupWebID($viewValue)|filter:{name:$viewValue}|limitTo:8\" typeahead-loading=\"searchloading\" typeahead-min-length=\"2\" typeahead-wait-ms=\"200\" typeahead-on-select=\"addNewUser('others', $item.webid)\"/>\n" +
+    "                    <input class=\"new-user vmiddle\" type=\"text\" ng-focus=\"isFocused\" ng-model=\"newUser['others'].webid\" typeahead=\"match.webid as match.name for match in lookupWebID($viewValue)|filter:{name:$viewValue}|limitTo:8\" typeahead-loading=\"searchloading\" typeahead-min-length=\"2\" typeahead-wait-ms=\"200\" typeahead-on-select=\"addNewUser('others', $item.webid)\"/>\n" +
     "                    <img ng-src=\"assets/loading.gif\" ng-show=\"searchloading\" />\n" +
-    "                    <button class=\"btn btn-sm btn-primary\" ng-click=\"addNewUser('others', newUser['others'].webid)\"><i class=\"fa fa-plus\"></i></button>\n" +
-    "                    <button class=\"btn btn-sm\" ng-click=\"cancelNewUser('others')\">Cancel</button>\n" +
+    "                    <button class=\"btn btn-sm btn-primary\" ng-click=\"addNewUser('others', newUser['others'].webid)\"><i class=\"fa fa-2x fa-check-circle-o\"></i></button>\n" +
+    "                    <button class=\"btn btn-sm\" ng-click=\"cancelNewUser('others')\"><i class=\"fa fa-2x fa-times-circle-o\"></i></button>\n" +
     "                    <br/>\n" +
     "                  </div>\n" +
-    "                  <button class=\"btn btn-primary\" ng-click=\"showNewUser('others')\">Add</button>\n" +
+    "                  <button class=\"btn btn-primary\" ng-click=\"showNewUser('others')\" ng-hide=\"newUser['others']\">Add</button>\n" +
     "                </div>\n" +
     "              </td>\n" +
     "            </tr>\n" +
@@ -287,7 +288,7 @@ angular.module("list/list.tpl.html", []).run(["$templateCache", function($templa
     "        </div>\n" +
     "        <div class=\"modal-footer\">\n" +
     "          <button class=\"btn btn-primary\" ng-click=\"setAcl()\">Set permissions</button>\n" +
-    "          <button class=\"btn btn-warning\" ng-click=\"cancel()\">Cancel</button>\n" +
+    "          <button class=\"btn btn-default\" ng-click=\"cancel()\">Cancel</button>\n" +
     "        </div>\n" +
     "    </div>\n" +
     "  </script>\n" +
