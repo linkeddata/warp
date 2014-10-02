@@ -311,50 +311,49 @@ angular.module( 'App.list', [
     }).
     success(function(data, status, headers) {
       if (status == 200) {
-          $scope.removeResource(resourceUri);
-//        // remove resource from the view
-//        $scope.removeResource(resourceUri);
-//        //TODO: remove the acl and meta files.
-//        var lh = parseLinkHeader(headers('Link'));
-//        console.log(lh);
-//        if (lh['acl'] && lh['acl']['href'].length > 0) {
-//          $http({
-//            method: 'DELETE',
-//            url: lh['acl']['href'],
-//            withCredentials: true
-//          }).
-//          success(function (data, status) {
-//            $scope.removeResource(lh['acl']['href']);
-//          }).
-//          error(function(data, status) {
-//            if (status == 401) {
-//              notify('Forbidden', 'Authentication required to delete the resource.');
-//            } else if (status == 403) {
-//              notify('Forbidden', 'You are not allowed to delete the resource.');
-//            } else {
-//              console.log('Failed to delete '+lh['acl']['href']+" Server responded with HTTP "+status);
-//            }
-//          });
-//        }
-//        if (lh['meta'] && lh['meta']['href'].length > 0) {
-//          $http({
-//            method: 'DELETE',
-//            url: lh['meta']['href'],
-//            withCredentials: true
-//          }).
-//          success(function (data, status) {
-//            $scope.removeResource(lh['meta']['href']);
-//          }).
-//          error(function(data, status) {
-//            if (status == 401) {
-//              notify('Forbidden', 'Authentication required to delete the resource.');
-//            } else if (status == 403) {
-//              notify('Forbidden', 'You are not allowed to delete the resource.');
-//            } else {
-//              console.log('Failed to delete '+lh['meta']['href']+" Server responded with HTTP "+status);
-//            }
-//          });
-//        }
+        // remove resource from the view
+        $scope.removeResource(resourceUri);
+        //TODO: remove the acl and meta files.
+        var lh = parseLinkHeader(headers('Link'));
+        console.log(lh);
+        if (lh['meta'] && lh['meta']['href'].length > 0) {
+          $http({
+            method: 'DELETE',
+            url: lh['meta']['href'],
+            withCredentials: true
+          }).
+          success(function (data, status) {
+            $scope.removeResource(lh['meta']['href']);
+          }).
+          error(function(data, status) {
+            if (status == 401) {
+              notify('Forbidden', 'Authentication required to delete '+lh['meta']['href']);
+            } else if (status == 403) {
+              notify('Forbidden', 'You are not allowed to delete '+lh['meta']['href']);
+            } else {
+              console.log('Failed to delete '+lh['meta']['href']+" Server responded with HTTP "+status);
+            }
+          });
+        }
+        if (lh['acl'] && lh['acl']['href'].length > 0) {
+          $http({
+            method: 'DELETE',
+            url: lh['acl']['href'],
+            withCredentials: true
+          }).
+          success(function (data, status) {
+            $scope.removeResource(lh['acl']['href']);
+          }).
+          error(function(data, status) {
+            if (status == 401) {
+              notify('Forbidden', 'Authentication required to delete '+lh['acl']['href']);
+            } else if (status == 403) {
+              notify('Forbidden', 'You are not allowed to delete '+lh['acl']['href']);
+            } else {
+              console.log('Failed to delete '+lh['acl']['href']+" Server responded with HTTP "+status);
+            }
+          });
+        }
       }
     }).
     error(function(data, status) {
