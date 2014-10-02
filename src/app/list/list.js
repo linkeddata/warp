@@ -436,7 +436,7 @@ angular.module( 'App.list', [
     });
   };
   // ACL dialog
-  $scope.openACLEditor = function (uri, type) {
+  $scope.openACLEditor = function (resources, uri, type) {
     // Find ACL uri and check if we can modify it
     $http({
       method: 'HEAD',
@@ -457,7 +457,10 @@ angular.module( 'App.list', [
         var modalInstance = $modal.open({
           templateUrl: 'acleditor.html',
           controller: ModalACLEditor,
-          resolve: { 
+          resolve: {
+            resources: function () {
+              return resources;
+            },
             uri: function () {
               return uri;
             },
@@ -479,7 +482,10 @@ angular.module( 'App.list', [
           var modalInstance = $modal.open({
             templateUrl: 'acleditor.html',
             controller: ModalACLEditor,
-            resolve: { 
+            resolve: {
+              resources: function () {
+                return resources;
+              },
               uri: function () {
                 return uri;
               },
@@ -521,7 +527,6 @@ angular.module( 'App.list', [
     $scope.listLocation = false;
   }
 });
-
 
 var addResource = function (resources, uri, type, size) {
   // Add resource to the list
@@ -684,7 +689,8 @@ var ModalUploadCtrl = function ($scope, $modalInstance, $upload, url, resources)
   };
 };
 
-var ModalACLEditor = function ($scope, $modalInstance, $http, uri, aclURI, type, exists) {
+var ModalACLEditor = function ($scope, $modalInstance, $http, resources, uri, aclURI, type, exists) {
+  $scope.resources = resources;
   $scope.uri = uri;
   $scope.aclURI = aclURI;
   $scope.resType = type;
@@ -870,9 +876,11 @@ var ModalACLEditor = function ($scope, $modalInstance, $http, uri, aclURI, type,
       data: acls
     }).
     success(function() {
+      $modalInstance.close();
+      addResource($scope.resources, $scope.aclURI, "File", "-");
+
       notify('Success', 'Updated ACL policies for: '+basename($scope.uri));
       //todo add the acl file to the list of files
-      $modalInstance.close();
     }).
     error(function(data, status, headers) {
       notify('Error - '+status, data);

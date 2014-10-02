@@ -81,7 +81,7 @@ angular.module("list/list.tpl.html", []).run(["$templateCache", function($templa
     "                </button>\n" +
     "                <ul class=\"dropdown-menu dropdown-menu-right left\" role=\"menu\">\n" +
     "                  <!-- <li><a ng-show=\"res.type != 'Directory'\"><i class=\"fa fa-2x fa-pencil-square-o fa-fw vmiddle\"></i> View/Edit</a></li> -->\n" +
-    "                  <li><a ng-click=\"openACLEditor(res.uri, res.type)\"><i class=\"fa fa-2x fa-unlock-alt fa-fw vmiddle\"></i> Permissions</a></li>\n" +
+    "                  <li><a ng-click=\"openACLEditor(resources, res.uri, res.type)\"><i class=\"fa fa-2x fa-unlock-alt fa-fw vmiddle\"></i> Permissions</a></li>\n" +
     "                  <li><a ng-click=\"openDelete(res.uri)\"><i class=\"fa fa-2x fa-trash-o fa-fw vmiddle\"></i> Delete</a></li>\n" +
     "                </ul>\n" +
     "              </div>\n" +
