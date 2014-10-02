@@ -163,12 +163,9 @@ angular.module( 'App.list', [
     // fetch user data
     f.nowOrWhenFetched($scope.path,undefined,function(ok, body) {
       if (!ok) {
-        notify('Error', 'Could not fetch dir listing. Is the server available?');
         ngProgress.complete();
         $scope.listLocation = false;
-
-        console.log(ok);
-        console.log(body);
+        notify('Error', 'Could not fetch dir listing. Is the server available?');
       } else {
         $scope.listLocation = true;
       }
@@ -251,12 +248,12 @@ angular.module( 'App.list', [
     }).
     success(function(data, status) {
       if (status == 200 || status == 201) {
-        notify('Success', 'Directory created.');
         // add dir to local list
         var now = new Date().getTime();
         var base = (document.location.href.charAt(document.location.href.length - 1) === '/')?document.location.href:document.location.href+'/';
         addResource($scope.resources, $scope.path+dirName, 'Directory');
         $scope.emptyDir = false;
+        notify('Success', 'Directory created.');
       }
     }).
     error(function(data, status) {
@@ -378,10 +375,10 @@ angular.module( 'App.list', [
       for(var i = $scope.resources.length - 1; i >= 0; i--){
         if($scope.resources[i].uri == uri) {
           $scope.resources.splice(i,1);
-          notify('Success', 'Deleted '+decodeURIComponent(basename(uri)+'.'));
           if ($scope.resources.length === 0) {
             $scope.emptyDir = true;
           }
+          notify('Success', 'Deleted '+decodeURIComponent(basename(uri)+'.'));
         }
       }
     }
@@ -878,9 +875,7 @@ var ModalACLEditor = function ($scope, $modalInstance, $http, resources, uri, ac
     success(function() {
       $modalInstance.close();
       addResource($scope.resources, $scope.aclURI, "File", "-");
-
       notify('Success', 'Updated ACL policies for: '+basename($scope.uri));
-      //todo add the acl file to the list of files
     }).
     error(function(data, status, headers) {
       notify('Error - '+status, data);
