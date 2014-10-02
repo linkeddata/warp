@@ -270,9 +270,10 @@ angular.module( 'App.list', [
   $scope.newFile = function(fileName) {
     // trim whitespaces
     fileName = fileName.replace(/^\s+|\s+$/g, "");
+    var uri = $scope.path+encodeURIComponent(fileName);
     $http({
       method: 'PUT', 
-      url: $scope.path+encodeURIComponent(fileName),
+      url: uri,
       data: '',
       headers: {
         'Content-Type': 'text/turtle',
@@ -283,7 +284,8 @@ angular.module( 'App.list', [
     success(function(data, status, headers) {
       if (status == 200 || status == 201) {
         // Add resource to the list
-        addResource($scope.resources, $scope.path+encodeURIComponent(fileName), 'File');
+        addResource($scope.resources, uri, 'File');
+        refreshResource($http, $scope.resources, uri);
         $scope.emptyDir = false;
         notify('Success', 'Resource created.');
       }
@@ -299,9 +301,25 @@ angular.module( 'App.list', [
     });
   };
 
-  $scope.refreshResource = function(uri) {
-    // TODO
-  };
+//  $scope.refreshResource = function(resources, uri) {
+//    $http({
+//      method: 'HEAD', 
+//      url: uri,
+//      withCredentials: true
+//    }).
+//    success(function(data, status, headers) {
+//      var l = headers('Content-Length');
+//      if (l && l > 0) {
+//        for(var i = resources.length - 1; i >= 0; i--) {
+//          if (resources[i].uri == uri) {
+//            resources[i].size = l;
+//          }
+//        }
+//      }
+//      return true;
+//    });
+//    return false;
+//  };
 
   $scope.deleteResource = function(resourceUri) {
     $http({
@@ -315,7 +333,6 @@ angular.module( 'App.list', [
         $scope.removeResource(resourceUri);
         //TODO: remove the acl and meta files.
         var lh = parseLinkHeader(headers('Link'));
-        console.log(lh);
         if (lh['meta'] && lh['meta']['href'].length > 0) {
           $http({
             method: 'DELETE',
@@ -524,9 +541,28 @@ angular.module( 'App.list', [
   }
 });
 
+refreshResource = function(http, resources, uri) {
+  http({
+    method: 'HEAD', 
+    url: uri,
+    withCredentials: true
+  }).
+  success(function(data, status, headers) {
+    var l = headers('Content-Length');
+    if (l && l > 0) {
+      for(var i = resources.length - 1; i >= 0; i--) {
+        if (resources[i].uri == uri) {
+          resources[i].size = l;
+        }
+      }
+    }
+    return true;
+  });
+  return false;
+};
+
 var addResource = function (resources, uri, type, size) {
   // Add resource to the list
-  console.log("Resource URI: "+uri);
   var base = (document.location.href.charAt(document.location.href.length - 1) === '/')?document.location.href:document.location.href+'/';
   var path = (type === 'File')?dirname(uri)+'/'+encodeURIComponent(basename(uri)):base+basename(uri)+'/';
   var now = new Date().getTime();
@@ -609,7 +645,7 @@ var ModalDeleteCtrl = function ($scope, $modalInstance, uri) {
   };
 };
 
-var ModalUploadCtrl = function ($scope, $modalInstance, $upload, url, resources) {
+var ModalUploadCtrl = function ($scope, $modalInstance, $http, $upload, url, resources) {
   $scope.url = url;
   $scope.resources = resources;
   $scope.container = basename(url);
@@ -663,6 +699,7 @@ var ModalUploadCtrl = function ($scope, $modalInstance, $upload, url, resources)
         // file is uploaded successfully
         $scope.filesUploading--;
         addResource($scope.resources, $scope.url+encodeURIComponent(file.name), 'File', file.size);
+        refreshResource($http, $scope.resources, $scope.url+encodeURIComponent(file.name));        
     });
   };
 
