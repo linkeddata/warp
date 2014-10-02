@@ -13,7 +13,6 @@ angular.module("list/list.tpl.html", []).run(["$templateCache", function($templa
   $templateCache.put("list/list.tpl.html",
     "<div>\n" +
     "  <div class=\"topbar box-shadow\" ng-show=\"path\">\n" +
-    "    <div class=\"pull-left white vmiddle\" ng-hide=\"notifStatus=='granted'\"><h1><button ng-click=\"authorizeNotifications()\" class=\"btn btn-primary\"><i class=\"fa fa-bullhorn fa-2x white vmiddle\" ng-class=\"notifStatus=='granted'?'orange':''\"></i> Enable notifications</button></h1></div>\n" +
     "    <div>\n" +
     "      <table class=\"create-new\">\n" +
     "      <tr>\n" +
