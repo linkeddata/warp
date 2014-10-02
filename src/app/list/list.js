@@ -837,17 +837,16 @@ var ModalACLEditor = function ($scope, $modalInstance, $http, uri, aclURI, type,
       //  if ($scope.policies[i].webid = FOAF("Agent").uri) {
           g.add($rdf.sym("#"+i), RDF("type"), WAC('Authorization'));
           g.add($rdf.sym("#"+i), WAC("accessTo"), $rdf.sym(decodeURIComponent($scope.uri)));
-          if ($scope.policies[i].classtype && $scope.policies[i].classtype == 'agentClass') {
+          if (($scope.policies[i].classtype && $scope.policies[i].classtype == 'agentClass') || ($scope.policies[i].webid == FOAF("Agent").uri)) {
             g.add($rdf.sym("#"+i), WAC("agentClass"), $rdf.sym($scope.policies[i].webid));
           } else {
             g.add($rdf.sym("#"+i), WAC("agent"), $rdf.sym($scope.policies[i].webid));
           }
-          if (($scope.policies[i].defaultForNew && $scope.policies[i].defaultForNew === true) || ($scope.policies[i].resType == 'Directory')) {
+          if (($scope.policies[i].defaultForNew && $scope.policies[i].defaultForNew === true) || ($scope.resType == 'Directory')) {
             g.add($rdf.sym("#"+i), WAC("defaultForNew"), $rdf.sym(decodeURIComponent($scope.uri))); 
           }
           if ($scope.policies[i].cat == "owner" && $scope.aclURI.length > 0) {
             g.add($rdf.sym("#"+i), WAC("accessTo"), $rdf.sym(decodeURIComponent($scope.aclURI)));
-            g.add($rdf.sym("#"+i), WAC("defaultForNew"), $rdf.sym(decodeURIComponent($scope.uri)));
           }
           for (var mode in $scope.policies[i].modes) {
             if ($scope.policies[i].modes[mode] === true) {
@@ -871,7 +870,7 @@ var ModalACLEditor = function ($scope, $modalInstance, $http, uri, aclURI, type,
       data: acls
     }).
     success(function() {
-      notify('Success', 'Updated ACL policies.');
+      notify('Success', 'Updated ACL policies for: '+basename($scope.uri));
       //todo add the acl file to the list of files
       $modalInstance.close();
     }).
