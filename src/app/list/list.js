@@ -301,26 +301,6 @@ angular.module( 'App.list', [
     });
   };
 
-//  $scope.refreshResource = function(resources, uri) {
-//    $http({
-//      method: 'HEAD', 
-//      url: uri,
-//      withCredentials: true
-//    }).
-//    success(function(data, status, headers) {
-//      var l = headers('Content-Length');
-//      if (l && l > 0) {
-//        for(var i = resources.length - 1; i >= 0; i--) {
-//          if (resources[i].uri == uri) {
-//            resources[i].size = l;
-//          }
-//        }
-//      }
-//      return true;
-//    });
-//    return false;
-//  };
-
   $scope.deleteResource = function(resourceUri) {
     $http({
       method: 'DELETE', 
@@ -333,7 +313,7 @@ angular.module( 'App.list', [
         $scope.removeResource(resourceUri);
         //TODO: remove the acl and meta files.
         var lh = parseLinkHeader(headers('Link'));
-        if (lh['meta'] && lh['meta']['href'].length > 0) {
+        if (lh['meta'] && lh['meta']['href'].length > 0 && lh['meta']['href'] != resourceUri) {
           $http({
             method: 'DELETE',
             url: lh['meta']['href'],
@@ -352,7 +332,7 @@ angular.module( 'App.list', [
             }
           });
         }
-        if (lh['acl'] && lh['acl']['href'].length > 0) {
+        if (lh['acl'] && lh['acl']['href'].length > 0 && lh['acl']['href'] != resourceUri) {
           $http({
             method: 'DELETE',
             url: lh['acl']['href'],
@@ -541,7 +521,7 @@ angular.module( 'App.list', [
   }
 });
 
-refreshResource = function(http, resources, uri) {
+var refreshResource = function(http, resources, uri) {
   http({
     method: 'HEAD', 
     url: uri,
@@ -561,6 +541,17 @@ refreshResource = function(http, resources, uri) {
   return false;
 };
 
+var resourceExists = function (resources, uri) {
+  if (resources.length > 0) {
+    for(var i = resources.length - 1; i >= 0; i--){
+      if(decodeURIComponent(resources[i].uri) == decodeURIComponent(uri)) {
+        return resources[i];
+      }
+    }
+  }
+  return undefined;
+};
+
 var addResource = function (resources, uri, type, size) {
   // Add resource to the list
   var base = (document.location.href.charAt(document.location.href.length - 1) === '/')?document.location.href:document.location.href+'/';
@@ -577,17 +568,7 @@ var addResource = function (resources, uri, type, size) {
     size: size
   };
   // overwrite previous resource
-  var found = false;
-  if (resources.length > 0) {
-    for(var i = resources.length - 1; i >= 0; i--){
-      if(decodeURIComponent(resources[i].uri) == decodeURIComponent(uri)) {
-        resources[i] = f;
-        found = true;
-        break;
-      }
-    }
-  }
-  if (!found) {
+  if (!resourceExists(resources, uri)) {
     resources.push(f);
   }
 };
@@ -735,6 +716,7 @@ var ModalACLEditor = function ($scope, $modalInstance, $http, resources, uri, ac
   
   $scope.isFocused = true;
   $scope.loading = true;
+  $scope.disableOk = false;
     
   // Load ACL triples
   var RDF = $rdf.Namespace("http://www.w3.org/1999/02/22-rdf-syntax-ns#");
@@ -813,7 +795,7 @@ var ModalACLEditor = function ($scope, $modalInstance, $http, resources, uri, ac
               getProfile($scope, triples[i].object.uri, policy);
             }
             policy.modes = $scope.findModes(g.statementsMatching(triples[i].subject, WAC("mode"), undefined));
-            if ($scope.resType == 'Directory') {
+            if ($scope.resType == 'Directory' || $scope.resType == '-') {
               policy.defaultForNew = (g.statementsMatching(triples[i].subject, WAC("defaultForNew"), $rdf.sym($scope.uri)).length > 0)?true:false;
             }
             if (triples[i].object.uri === FOAF("Agent").uri) {
@@ -881,7 +863,7 @@ var ModalACLEditor = function ($scope, $modalInstance, $http, resources, uri, ac
           } else {
             g.add($rdf.sym("#"+i), WAC("agent"), $rdf.sym($scope.policies[i].webid));
           }
-          if (($scope.policies[i].defaultForNew && $scope.policies[i].defaultForNew === true) || ($scope.resType == 'Directory')) {
+          if ($scope.resType == 'Directory' || $scope.resType == '-') {
             g.add($rdf.sym("#"+i), WAC("defaultForNew"), $rdf.sym(decodeURIComponent($scope.uri))); 
           }
           if ($scope.policies[i].cat == "owner" && $scope.aclURI.length > 0) {
@@ -900,6 +882,7 @@ var ModalACLEditor = function ($scope, $modalInstance, $http, resources, uri, ac
   
   // PUT the ACL policy on the server
   $scope.setAcl = function () {
+    $scope.disableOk = true;
     var acls = $scope.serializeTurtle();
     $http({
       method: 'PUT',
@@ -910,10 +893,17 @@ var ModalACLEditor = function ($scope, $modalInstance, $http, resources, uri, ac
     }).
     success(function() {
       $modalInstance.close();
-      addResource($scope.resources, $scope.aclURI, "File", "-");
+      var res = resourceExists($scope.resources, $scope.aclURI);
+      if (res === undefined && resources[0].uri == dirname($scope.aclURI)+'/') {
+        addResource($scope.resources, $scope.aclURI, "File", "-");
+      }
+
+      refreshResource($http, $scope.resources, $scope.aclURI);
+      $scope.disableOk = false;
       notify('Success', 'Updated ACL policies for: '+basename($scope.uri));
     }).
     error(function(data, status, headers) {
+      $scope.disableOk = false;
       notify('Error - '+status, data);
     });
   };

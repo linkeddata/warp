@@ -286,7 +286,7 @@ angular.module("list/list.tpl.html", []).run(["$templateCache", function($templa
     "          </table>\n" +
     "        </div>\n" +
     "        <div class=\"modal-footer\">\n" +
-    "          <button class=\"btn btn-primary\" ng-click=\"setAcl()\">Set permissions</button>\n" +
+    "          <button class=\"btn btn-primary\" ng-click=\"setAcl()\" ng-disabled=\"disableOk\">Set permissions</button>\n" +
     "          <button class=\"btn btn-default\" ng-click=\"cancel()\">Cancel</button>\n" +
     "        </div>\n" +
     "    </div>\n" +
