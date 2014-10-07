@@ -795,9 +795,7 @@ var ModalACLEditor = function ($scope, $modalInstance, $http, resources, uri, ac
               getProfile($scope, triples[i].object.uri, policy);
             }
             policy.modes = $scope.findModes(g.statementsMatching(triples[i].subject, WAC("mode"), undefined));
-            if ($scope.resType == 'Directory' || $scope.resType == '-') {
-              policy.defaultForNew = (g.statementsMatching(triples[i].subject, WAC("defaultForNew"), $rdf.sym($scope.uri)).length > 0)?true:false;
-            }
+            policy.defaultForNew = (g.statementsMatching(triples[i].subject, WAC("defaultForNew"), $rdf.sym($scope.uri)).length > 0)?true:false;
             if (triples[i].object.uri === FOAF("Agent").uri) {
               policy.cat = 'any';
             } else if (policy.modes.Control === true) {
@@ -863,7 +861,7 @@ var ModalACLEditor = function ($scope, $modalInstance, $http, resources, uri, ac
           } else {
             g.add($rdf.sym("#"+i), WAC("agent"), $rdf.sym($scope.policies[i].webid));
           }
-          if ($scope.resType == 'Directory' || $scope.resType == '-') {
+          if ($scope.policies[i].defaultForNew) {
             g.add($rdf.sym("#"+i), WAC("defaultForNew"), $rdf.sym(decodeURIComponent($scope.uri))); 
           }
           if ($scope.policies[i].cat == "owner" && $scope.aclURI.length > 0) {
