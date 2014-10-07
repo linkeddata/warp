@@ -954,7 +954,11 @@ var ModalACLEditor = function ($scope, $modalInstance, $http, resources, uri, ac
             } else {
               match.img = value.img[0];
             }
-            match.name = value.name[0] + ' ('+key+')';
+            if (value.name && value.name[0]) {
+              match.name = value.name[0] + ' ('+key+')';
+            } else {
+              match.name = key;
+            }
             matches.push(match);
           });
         }
