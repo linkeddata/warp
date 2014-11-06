@@ -165,6 +165,8 @@ angular.module( 'App.list', [
       if (!ok) {
         ngProgress.complete();
         $scope.listLocation = false;
+        console.log(ok);
+        console.log(body);
         notify('Error', 'Could not fetch dir listing. Is the server available?');
       } else {
         $scope.listLocation = true;
