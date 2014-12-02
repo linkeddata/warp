@@ -300,6 +300,39 @@ angular.module( 'App.list', [
       }
     });
   };
+  
+  $scope.updateFile = function(fileContent) {
+	var uri = $scope.uri;
+	var data = $("#fileContent").val();
+    $http({
+      method: 'PUT', 
+      url: uri,
+      data: data,
+      headers: {
+        'Content-Type': 'text/turtle',
+        'Link': '<http://www.w3.org/ns/ldp#Resource>; rel="type"'
+      },
+      withCredentials: true
+    }).
+    success(function(data, status, headers) {
+      if (status == 200 || status == 201) {
+        // Add resource to the list
+        //addResource($scope.resources, uri, 'File');
+        //refreshResource($http, $scope.resources, uri);
+        //$scope.emptyDir = false;
+        notify('Success', 'Resource updated.');
+      }
+    }).
+    error(function(data, status) {
+      if (status == 401) {
+        notify('Forbidden', 'Authentication required to update resource.');
+      } else if (status == 403) {
+        notify('Forbidden', 'You are not allowed to update resource.');
+      } else {
+        notify('Failed '+status, data);
+      }
+    });
+  };
 
   $scope.deleteResource = function(resourceUri) {
     $http({
@@ -411,6 +444,21 @@ angular.module( 'App.list', [
       }
     });
     modalInstance.result.then($scope.deleteResource);
+  };
+  // File editor dialog
+  $scope.openFileEditor = function (uri) {
+	  $scope.uri = uri;
+	  var modalInstance = $modal.open({
+      templateUrl: 'fileEditor.html',
+      controller: ModalFileEditorCtrl,
+      size: 'sm',
+	  resolve: { 
+        uri: function () {
+          return uri;
+        }
+	  }
+    });
+    modalInstance.result.then($scope.updateFile);
   };
   // New file upload dialog
   $scope.openNewUpload = function (url) {
@@ -608,6 +656,51 @@ var ModalNewFileCtrl = function ($scope, $modalInstance) {
   $scope.cancel = function () {
     $modalInstance.dismiss('cancel');
   };
+};
+
+var ModalFileEditorCtrl = function ($scope, $modalInstance, uri, $http) {
+  // TODO
+  // $scope.expr = "/^[A-Za-z0-9_-(\.)]*$/";
+
+  $scope.isFocused = true;
+
+  $scope.updateFile = function(fileContent) {
+    $modalInstance.close(fileContent);
+  };
+
+  $scope.ok = function () {
+    $modalInstance.close();
+  };
+
+  $scope.cancel = function () {
+    $modalInstance.dismiss('cancel');
+  };
+  
+  $http({
+    method: 'GET', 
+    url: uri,
+    data: '',
+    headers: {
+      'Accept': 'text/turtle',
+    },
+    withCredentials: true
+  }).
+  success(function(data, status, headers) {
+    if (status == 200 || status == 201) {
+      // Load the rdf to the textarea
+	  $("#fileContent").val(data);
+	  notify('Success', 'Resource retrieved.');
+    }
+  }).
+  error(function(data, status) {
+    if (status == 401) {
+      notify('Forbidden', 'Authentication required to edit the resource.');
+    } else if (status == 403) {
+      notify('Forbidden', 'You are not allowed to edit the resource.');
+    } else {
+      notify('Failed '+status, data);
+    }
+  });  
 };
 
 var ModalDeleteCtrl = function ($scope, $modalInstance, uri) {
