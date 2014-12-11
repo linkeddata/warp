@@ -82,6 +82,7 @@ angular.module("list/list.tpl.html", []).run(["$templateCache", function($templa
     "                  <!-- <li><a ng-show=\"res.type != 'Directory'\"><i class=\"fa fa-2x fa-pencil-square-o fa-fw vmiddle\"></i> View/Edit</a></li> -->\n" +
     "                  <li><a ng-click=\"openACLEditor(resources, res.uri, res.type)\"><i class=\"fa fa-2x fa-unlock-alt fa-fw vmiddle\"></i> Permissions</a></li>\n" +
     "                  <li><a ng-click=\"openDelete(res.uri)\"><i class=\"fa fa-2x fa-trash-o fa-fw vmiddle\"></i> Delete</a></li>\n" +
+    "                  <li><a ng-click=\"openFileEditor(res.uri)\"><i class=\"fa fa-2x fa-pencil fa-fw vmiddle\"></i> Edit</a></li>\n" +
     "                </ul>\n" +
     "              </div>\n" +
     "          </td>\n" +
@@ -131,6 +132,28 @@ angular.module("list/list.tpl.html", []).run(["$templateCache", function($templa
     "        </div>\n" +
     "    </div>\n" +
     "  </script>\n" +
+    "  \n" +
+    "  <!-- File editor modal -->\n" +
+    "  <script type=\"text/ng-template\" id=\"fileEditor.html\">\n" +
+    "    <div>\n" +
+    "      <div class=\"modal-header\">\n" +
+    "            <h3 class=\"modal-title\">File Editor</h3>\n" +
+    "        </div>\n" +
+    "        <div class=\"modal-body\">\n" +
+    "          <form name=\"newFileContent\">\n" +
+    "            <fieldset>\n" +
+    "              <textarea id=\"fileContent\" name=\"fileContent\" class=\"nginput-new\"></textarea>\n" +
+    "              <!-- <span ng-hide=\"newFileName.fileName.$valid\">Only use: a-z A-Z 0-9 _ - .</span> -->\n" +
+    "            </fieldset>\n" +
+    "          </form>\n" +
+    "          <br/><small class=\"orange\">Warning: any changes to this file will overwrite it!</small>\n" +
+    "        </div>\n" +
+    "        <div class=\"modal-footer\">\n" +
+    "          <button class=\"btn btn-primary\" ng-click=\"updateFile(fileContent)\">Save</button>\n" +
+    "          <button class=\"btn btn-default\" ng-click=\"cancel()\">Cancel</button>\n" +
+    "        </div>\n" +
+    "    </div>\n" +
+    "    </script>\n" +
     "\n" +
     "  <!-- Upload file modal -->\n" +
     "  <script type=\"text/ng-template\" id=\"uploadfiles.html\">\n" +

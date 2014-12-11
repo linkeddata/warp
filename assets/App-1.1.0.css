@@ -198,6 +198,18 @@ caption {
   background: #ff3c1f;
   color: white;
 }
+.nginput-new {
+  transition: 0.3s linear all;
+  background: white;
+  width: 100%;
+  height: 250px;
+  font-size: 0.8em;
+  padding: 5px;
+}
+.nginput-new.ng-invalid {
+  background: #ff3c1f;
+  color: white;
+}
 /*  ng-repeat Animation  */
 /*
 .repeat-animation.ng-enter {
