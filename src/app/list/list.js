@@ -1030,7 +1030,7 @@ var ModalACLEditor = function ($scope, $modalInstance, $http, resources, uri, ac
   // attempt to find a person using webizen.org
   $scope.lookupWebID = function(query) {
     // get results from server
-    return $http.get('http://api.webizen.org/v1/search', {
+    return $http.get('https://api.webizen.org/v1/search', {
       params: {
         q: query
       }

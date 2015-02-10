@@ -43,7 +43,7 @@ angular.module( 'App.login', [
       $scope.userProfile.webid = webid;
       $scope.loginSuccess = true;
       // index or update the authenticated WebID on webizen.org
-      $http.get('http://api.webizen.org/v1/search', {
+      $http.get('https://api.webizen.org/v1/search', {
         params: {
           q: webid
         }
