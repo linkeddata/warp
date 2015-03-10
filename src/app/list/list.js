@@ -897,6 +897,7 @@ var ModalACLEditor = function ($scope, $modalInstance, $http, resources, uri, ac
             }
             arr.push(policy);
           }
+
           return true;
         } else {
           return false; 
@@ -922,6 +923,7 @@ var ModalACLEditor = function ($scope, $modalInstance, $http, resources, uri, ac
     $scope.policies.push(others);
     $scope.loading = false;
   }
+
   
   $scope.haveCategory = function (cat) {
     if ($scope.policies) {
@@ -944,7 +946,9 @@ var ModalACLEditor = function ($scope, $modalInstance, $http, resources, uri, ac
 
     if ($scope.policies.length > 0) {
       for (var i=0; i<$scope.policies.length;i++) {
-      //  if ($scope.policies[i].webid = FOAF("Agent").uri) {
+          if ($scope.policies[i].cat == 'any' && (!$scope.policies[i].modes.Read || !$scope.policies[i].modes.Write || !$scope.policies[i].modes.Append)) {
+            continue;
+          }
           g.add($rdf.sym("#"+i), RDF("type"), WAC('Authorization'));
           g.add($rdf.sym("#"+i), WAC("accessTo"), $rdf.sym(decodeURIComponent($scope.uri)));
           if (($scope.policies[i].classtype && $scope.policies[i].classtype == 'agentClass') || ($scope.policies[i].webid == FOAF("Agent").uri)) {
@@ -986,7 +990,6 @@ var ModalACLEditor = function ($scope, $modalInstance, $http, resources, uri, ac
       if (res === undefined && resources[0].uri == dirname($scope.aclURI)+'/') {
         addResource($scope.resources, $scope.aclURI, "File", "-");
       }
-
       refreshResource($http, $scope.resources, $scope.aclURI);
       $scope.disableOk = false;
       notify('Success', 'Updated ACL policies for: '+basename($scope.uri));
@@ -1030,7 +1033,7 @@ var ModalACLEditor = function ($scope, $modalInstance, $http, resources, uri, ac
   // attempt to find a person using webizen.org
   $scope.lookupWebID = function(query) {
     // get results from server
-    return $http.get('https://api.webizen.org/v1/search', {
+    return $http.get('http://api.webizen.org/v1/search', {
       params: {
         q: query
       }

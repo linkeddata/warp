@@ -9,10 +9,8 @@ module.exports = function ( karma ) {
      * This is the list of file patterns to load into the browser during testing.
      */
     files: [
-      'vendor/angular-file-upload/angular-file-upload-html5-shim.js',
       'vendor/angular/angular.js',
       'vendor/angular-file-upload/angular-file-upload.js',
-      'vendor/angular/angular-animate.js',
       'vendor/angular-bootstrap/ui-bootstrap-tpls.min.js',
       'vendor/angular-bootstrap/ui-bootstrap.min.js',
       'vendor/placeholders/angular-placeholders-0.0.1-SNAPSHOT.min.js',
@@ -22,7 +20,6 @@ module.exports = function ( karma ) {
       'vendor/rdflib.js/rdflib.js',
       'vendor/notify/notify.js',
       'vendor/moment/moment.min.js',
-      'vendor/ng-flow/ng-flow-standalone.js',
       'build/templates-app.js',
       'build/templates-common.js',
       'vendor/angular-mocks/angular-mocks.js',
