@@ -9,8 +9,9 @@ module.exports = function ( karma ) {
      * This is the list of file patterns to load into the browser during testing.
      */
     files: [
+      'vendor/ng-file-upload/angular-file-upload-shim.min.js',
       'vendor/angular/angular.js',
-      'vendor/angular-file-upload/angular-file-upload.js',
+      'vendor/ng-file-upload/angular-file-upload.min.js',
       'vendor/angular-bootstrap/ui-bootstrap-tpls.min.js',
       'vendor/angular-bootstrap/ui-bootstrap.min.js',
       'vendor/placeholders/angular-placeholders-0.0.1-SNAPSHOT.min.js',
