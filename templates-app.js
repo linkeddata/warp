@@ -177,7 +177,7 @@ angular.module("list/list.tpl.html", []).run(["$templateCache", function($templa
     "          </tr>\n" +
     "          <tr ng-repeat=\"file in selectedFiles track by $index\" ng-class=\"progress[file.name] == 100?'done':''\">\n" +
     "            <td>{{file.name|truncate:25}}</td>\n" +
-    "            <td><progressbar value=\"progress[file.name]\"></progressbar></td>\n" +
+    "            <td><div tooltip-placement=\"bottom\" tooltip=\"Uploading...{{progress[file.name]}}%\"><progressbar value=\"progress[file.name]\"></progressbar></div></td>\n" +
     "            <td class=\"pull-right\">\n" +
     "              <button ng-hide=\"progress[file.name] == 100\" class=\"btn btn-mini btn-default\" ng-click=\"abort(file.name)\"><i class=\"fa fa-2x fa-times\"></i></button>\n" +
     "              <button ng-show=\"progress[file.name] == 100\" class=\"btn btn-mini btn-default\" ng-click=\"remove(file.name)\"><i class=\"fa fa-2x fa-trash-o\"></i></button>\n" +
@@ -186,7 +186,7 @@ angular.module("list/list.tpl.html", []).run(["$templateCache", function($templa
     "        </table>\n" +
     "      </div>\n" +
     "      <div class=\"modal-footer\">\n" +
-    "        <button class=\"btn btn-default\" ng-click=\"clearUploaded()\" ng-show=\"selectedFiles.length > 0\">Clear uploaded</button>\n" +
+    "        <button class=\"btn btn-default\" ng-click=\"clearUploaded()\" ng-show=\"selectedFiles.length > 0\">Clear files</button>\n" +
     "        <button class=\"btn btn-default\" ng-click=\"cancel()\">Close</button>\n" +
     "      </div>\n" +
     "    </div>\n" +
