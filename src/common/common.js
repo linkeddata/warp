@@ -53,7 +53,10 @@ var getProfile = function(scope, uri, profile, forWebID) {
         }
       }
 
-      var classType = (g.any(webidRes, RDF('type')).value == FOAF('Group').value)?'agentClass':'agent';
+      var cls = g.statementsMatching(webidRes, RDF('type'), undefined)[0];
+      cls = (cls)?cls.value:'';
+
+      var classType = (cls == FOAF('Group').value)?'agentClass':'agent';
       // get some basic info
       var name = g.any(webidRes, FOAF('name'));
       // Clean up name

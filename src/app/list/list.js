@@ -909,6 +909,21 @@ var ModalACLEditor = function ($scope, $modalInstance, $http, resources, uri, ac
         $scope.getPolicies(g.statementsMatching(undefined, WAC("agent"), undefined), 'others', $scope.policies);
         $scope.getPolicies(g.statementsMatching(undefined, WAC("agentClass"), undefined), 'others', $scope.policies);
 
+        // add options for all, if no Any cat exists
+        var any = false;
+        $scope.policies.forEach(function(policy) {
+          if (policy.cat == 'any') {
+            any = true;
+          }
+        });
+        if (!any) {
+          $scope.policies.push({
+            webid: FOAF("Agent").uri,
+            cat: 'any',
+            classType: 'agentClass'
+          });
+        }
+
         $scope.loading = false;
         $scope.$apply();
       }
@@ -946,7 +961,9 @@ var ModalACLEditor = function ($scope, $modalInstance, $http, resources, uri, ac
 
     if ($scope.policies.length > 0) {
       for (var i=0; i<$scope.policies.length;i++) {
-          if ($scope.policies[i].cat == 'any' && (!$scope.policies[i].modes.Read || !$scope.policies[i].modes.Write || !$scope.policies[i].modes.Append)) {
+        console.log($scope.policies[i]);
+          if ($scope.policies[i].cat == 'any' && !$scope.policies[i].modes || (!$scope.policies[i].modes.Read && !$scope.policies[i].modes.Write && !$scope.policies[i].modes.Append)) {
+            console.log($scope.policies[i]);
             continue;
           }
           g.add($rdf.sym("#"+i), RDF("type"), WAC('Authorization'));
@@ -977,27 +994,28 @@ var ModalACLEditor = function ($scope, $modalInstance, $http, resources, uri, ac
   $scope.setAcl = function () {
     $scope.disableOk = true;
     var acls = $scope.serializeTurtle();
-    $http({
-      method: 'PUT',
-      url: $scope.aclURI,
-      withCredentials: true,
-      headers: {"Content-Type": "text/turtle"},
-      data: acls
-    }).
-    success(function() {
-      $modalInstance.close();
-      var res = resourceExists($scope.resources, $scope.aclURI);
-      if (res === undefined && resources[0].uri == dirname($scope.aclURI)+'/') {
-        addResource($scope.resources, $scope.aclURI, "File", "-");
-      }
-      refreshResource($http, $scope.resources, $scope.aclURI);
-      $scope.disableOk = false;
-      notify('Success', 'Updated ACL policies for: '+basename($scope.uri));
-    }).
-    error(function(data, status, headers) {
-      $scope.disableOk = false;
-      notify('Error - '+status, data);
-    });
+    console.log(acls);
+    // $http({
+    //   method: 'PUT',
+    //   url: $scope.aclURI,
+    //   withCredentials: true,
+    //   headers: {"Content-Type": "text/turtle"},
+    //   data: acls
+    // }).
+    // success(function() {
+    //   $modalInstance.close();
+    //   var res = resourceExists($scope.resources, $scope.aclURI);
+    //   if (res === undefined && resources[0].uri == dirname($scope.aclURI)+'/') {
+    //     addResource($scope.resources, $scope.aclURI, "File", "-");
+    //   }
+    //   refreshResource($http, $scope.resources, $scope.aclURI);
+    //   $scope.disableOk = false;
+    //   notify('Success', 'Updated ACL policies for: '+basename($scope.uri));
+    // }).
+    // error(function(data, status, headers) {
+    //   $scope.disableOk = false;
+    //   notify('Error - '+status, data);
+    // });
   };
   
   $scope.removeUser = function (uri, webid) {
