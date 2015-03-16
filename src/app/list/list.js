@@ -994,28 +994,27 @@ var ModalACLEditor = function ($scope, $modalInstance, $http, resources, uri, ac
   $scope.setAcl = function () {
     $scope.disableOk = true;
     var acls = $scope.serializeTurtle();
-    console.log(acls);
-    // $http({
-    //   method: 'PUT',
-    //   url: $scope.aclURI,
-    //   withCredentials: true,
-    //   headers: {"Content-Type": "text/turtle"},
-    //   data: acls
-    // }).
-    // success(function() {
-    //   $modalInstance.close();
-    //   var res = resourceExists($scope.resources, $scope.aclURI);
-    //   if (res === undefined && resources[0].uri == dirname($scope.aclURI)+'/') {
-    //     addResource($scope.resources, $scope.aclURI, "File", "-");
-    //   }
-    //   refreshResource($http, $scope.resources, $scope.aclURI);
-    //   $scope.disableOk = false;
-    //   notify('Success', 'Updated ACL policies for: '+basename($scope.uri));
-    // }).
-    // error(function(data, status, headers) {
-    //   $scope.disableOk = false;
-    //   notify('Error - '+status, data);
-    // });
+    $http({
+      method: 'PUT',
+      url: $scope.aclURI,
+      withCredentials: true,
+      headers: {"Content-Type": "text/turtle"},
+      data: acls
+    }).
+    success(function() {
+      $modalInstance.close();
+      var res = resourceExists($scope.resources, $scope.aclURI);
+      if (res === undefined && resources[0].uri == dirname($scope.aclURI)+'/') {
+        addResource($scope.resources, $scope.aclURI, "File", "-");
+      }
+      refreshResource($http, $scope.resources, $scope.aclURI);
+      $scope.disableOk = false;
+      notify('Success', 'Updated ACL policies for: '+basename($scope.uri));
+    }).
+    error(function(data, status, headers) {
+      $scope.disableOk = false;
+      notify('Error - '+status, data);
+    });
   };
   
   $scope.removeUser = function (uri, webid) {
