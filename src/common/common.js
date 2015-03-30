@@ -15,79 +15,80 @@ var getProfile = function(scope, uri, profile, forWebID) {
   profile.loading = true;
 
   // fetch user data
-  return f.nowOrWhenFetched(docURI,undefined,function(ok, body) {
-    if (!ok) {
-      profile.uri = webid;
-      // if (!profile.name || profile.name.length === 0 || !forWebID) {
-      //   profile.name = webid;
-      // }
-      console.log('Warning - profile not found.');
-      profile.loading = false;
-      scope.$apply();
-      return false;
-    } else {
-      if (!forWebID) {
-        var sameAs = g.statementsMatching(webidRes, OWL('sameAs'), undefined);
-        if (sameAs.length > 0) {
-          sameAs.forEach(function(same){
-            if (same['object']['value'].length > 0) {
-              getProfile(scope, same['object']['value'], profile, webid);
-            }
-          });
-        }
-        var seeAlso = g.statementsMatching(webidRes, OWL('seeAlso'), undefined);
-        if (seeAlso.length > 0) {
-          seeAlso.forEach(function(see){
-            if (see['object']['value'].length > 0) {
-              getProfile(scope, see['object']['value'], profile, webid);
-            }
-          });
-        }
-        var prefs = g.statementsMatching(webidRes, SPACE('preferencesFile'), undefined);
-        if (prefs.length > 0) {
-          prefs.forEach(function(pref){
-            if (pref['object']['value'].length > 0) {
-              getProfile(scope, pref['object']['value'], profile, webid);
-            }
-          });
-        }
-      }
-
-      var cls = g.statementsMatching(webidRes, RDF('type'), undefined)[0];
-      cls = (cls)?cls.value:'';
-
-      var classType = (cls == FOAF('Group').value)?'agentClass':'agent';
-      // get some basic info
-      var name = g.any(webidRes, FOAF('name'));
-      // Clean up name
-      name = (name)?name.value:'';
-      var pic = g.any(webidRes, FOAF('img'));
-      var depic = g.any(webidRes, FOAF('depiction'));
-      // set avatar picture
-      if (pic) {
-        pic = pic.value;
+  return new Promise(function(resolve) {
+    f.nowOrWhenFetched(docURI,undefined,function(ok, body) {
+      if (!ok) {
+        profile.uri = webid;
+        // if (!profile.name || profile.name.length === 0 || !forWebID) {
+        //   profile.name = webid;
+        // }
+        console.log('Warning - profile not found.');
+        profile.loading = false;
+        scope.$apply();
+        return false;
       } else {
-        if (depic) {
-          pic = depic.value;
-        } else {
-          pic = '';
+        if (!forWebID) {
+          var sameAs = g.statementsMatching(webidRes, OWL('sameAs'), undefined);
+          if (sameAs.length > 0) {
+            sameAs.forEach(function(same){
+              if (same['object']['value'].length > 0) {
+                getProfile(scope, same['object']['value'], profile, webid);
+              }
+            });
+          }
+          var seeAlso = g.statementsMatching(webidRes, OWL('seeAlso'), undefined);
+          if (seeAlso.length > 0) {
+            seeAlso.forEach(function(see){
+              if (see['object']['value'].length > 0) {
+                getProfile(scope, see['object']['value'], profile, webid);
+              }
+            });
+          }
+          var prefs = g.statementsMatching(webidRes, SPACE('preferencesFile'), undefined);
+          if (prefs.length > 0) {
+            prefs.forEach(function(pref){
+              if (pref['object']['value'].length > 0) {
+                getProfile(scope, pref['object']['value'], profile, webid);
+              }
+            });
+          }
         }
-      }
 
-      if (!profile.classtype || profile.classtype.length === 0) {
-        profile.classtype = classType;
-      }
-      if (!profile.fullname || profile.fullname.length === 0 || profile.fullname === webid) {
-        profile.fullname = name;
-      }
-      if (!profile.picture || profile.picture.length === 0) {
-        profile.picture = pic;
-      }
-      profile.loading = false;
+        var cls = g.statementsMatching(webidRes, RDF('type'), undefined)[0];
+        cls = (cls)?cls.value:'';
 
-      scope.$apply();
-      return true;
-    }
+        var classType = (cls == FOAF('Group').value)?'agentClass':'agent';
+        // get some basic info
+        var name = g.any(webidRes, FOAF('name'));
+        // Clean up name
+        name = (name)?name.value:'';
+        var pic = g.any(webidRes, FOAF('img'));
+        var depic = g.any(webidRes, FOAF('depiction'));
+        // set avatar picture
+        if (pic) {
+          pic = pic.value;
+        } else {
+          if (depic) {
+            pic = depic.value;
+          } else {
+            pic = '';
+          }
+        }
+        profile.webid = webid;
+        if (!profile.classtype || profile.classtype.length === 0) {
+          profile.classtype = classType;
+        }
+        if (!profile.fullname || profile.fullname.length === 0 || profile.fullname === webid) {
+          profile.fullname = name;
+        }
+        if (!profile.picture || profile.picture.length === 0) {
+          profile.picture = pic;
+        }
+        profile.loading = false;
+        
+        resolve(profile);
+      }
+    });
   });
 };
 

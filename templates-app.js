@@ -16,7 +16,7 @@ angular.module("list/list.tpl.html", []).run(["$templateCache", function($templa
     "    <div>\n" +
     "      <table class=\"create-new\">\n" +
     "      <tr>\n" +
-    "        <td class=\"vtop\">\n" +
+    "        <td class=\"vtop pull-left\">\n" +
     "          <div class=\"btn-group\" dropdown>\n" +
     "            <button type=\"button\" class=\"btn btn-success dropdown-toggle\" ng-disabled=\"disabled\" tooltip-placement=\"bottom\" tooltip=\"New...\"><i class=\"fa fa-2x fa-plus\"></i></button>\n" +
     "            <ul class=\"dropdown-menu\" role=\"menu\">\n" +
@@ -26,16 +26,21 @@ angular.module("list/list.tpl.html", []).run(["$templateCache", function($templa
     "            </ul>\n" +
     "          </div>\n" +
     "        </td>\n" +
-    "        <td class=\"vtop\">\n" +
+    "        <td class=\"vtop pull-left\">\n" +
     "          <button type=\"button\" class=\"btn btn-info\" tooltip-placement=\"bottom\" tooltip=\"Pick a different storage location\" ng-click=\"changeLocation('/list/')\"><i class=\"fa fa-2x fa-database white\"></i></button>\n" +
     "        </td>\n" +
-    "        <td>\n" +
+    "        <td class=\"pull-left\">\n" +
     "          <div id=\"crumbs\" class=\"collapse navbar-collapse\">\n" +
     "            <ul>\n" +
     "              <li ng-repeat=\"crumb in breadCrumbs\">\n" +
     "                <a href=\"{{crumb.uri}}\"><i class=\"fa white\" ng-class=\"$first?'fa-home':'fa-folder-open-o'\"></i><span class=\"white\"> {{crumb.name}}</span></a>\n" +
     "              </li>\n" +
     "            </ul>\n" +
+    "          </div>\n" +
+    "        </td>\n" +
+    "        <td class=\"pull-right vmiddle white\">\n" +
+    "          <div tooltip-placement=\"bottom\" tooltip=\"{{userProfile.fullname}}\" class=\"avatar-frame\" ng-show=\"userProfile.webid\">\n" +
+    "            <a href=\"{{userProfile.webid}}\" target=\"_blank\"><img ng-src=\"{{userProfile.picture}}\"></a>\n" +
     "          </div>\n" +
     "        </td>\n" +
     "      </tr>\n" +

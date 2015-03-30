@@ -140,6 +140,7 @@ caption {
 .create-new {
   position: relative;
   top: 10px;
+  width: 100%;
 }
 .create-new button {
   width: 50px;
@@ -6307,15 +6308,10 @@ h2 {
   border: 0px;
   margin-bottom: 10px;
 }
-.avatar-frame,
 .avatar-frame img {
-  width: 100px;
-  height: 100px;
-  -webkit-border-radius: 70px;
-  /* Saf3+, Chrome */
-  border-radius: 70px;
-  /* Opera 10.5, IE 9 */
-  /*-moz-border-radius: 70px;  Disabled for FF1+ */
+  width: 50px;
+  height: 50px;
+  border: 1px solid #fff;
 }
 /**
  * Other

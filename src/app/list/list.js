@@ -161,15 +161,24 @@ angular.module( 'App.list', [
     $rdf.Fetcher.crossSiteProxyTemplate=PROXY;
 
     // fetch user data
-    f.nowOrWhenFetched($scope.path,undefined,function(ok, body) {
+    f.nowOrWhenFetched($scope.path,undefined,function(ok, body, xhr) {
       if (!ok) {
         ngProgress.complete();
         $scope.listLocation = false;
-        notify('Error', 'Could not fetch dir listing. Is the server available?');
+        notify('Error', 'Could not fetch dir listing. HTTP '+xhr.status);
       } else {
         $scope.listLocation = true;
       }
       $scope.$apply();
+
+      $scope.userProfile = {};
+      var user = xhr.getResponseHeader('User');
+      if (user && user.length > 0 && user.slice(0,4) == 'http') {        
+        getProfile($scope, user, $scope.userProfile).then(function(profile){
+          $scope.userProfile = profile;
+          $scope.$apply();
+        });
+      }
 
       var dirs = g.statementsMatching(undefined, RDF("type"), POSIX("Directory"));
       for ( var i in dirs ) {
