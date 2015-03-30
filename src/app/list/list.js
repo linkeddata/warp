@@ -961,29 +961,28 @@ var ModalACLEditor = function ($scope, $modalInstance, $http, resources, uri, ac
 
     if ($scope.policies.length > 0) {
       for (var i=0; i<$scope.policies.length;i++) {
-        console.log($scope.policies[i]);
-          if ($scope.policies[i].cat == 'any' && !$scope.policies[i].modes || (!$scope.policies[i].modes.Read && !$scope.policies[i].modes.Write && !$scope.policies[i].modes.Append)) {
-            console.log($scope.policies[i]);
-            continue;
+        if ($scope.policies[i].cat == 'any' && !$scope.policies[i].modes || (!$scope.policies[i].modes.Read && !$scope.policies[i].modes.Write && !$scope.policies[i].modes.Append)) {
+          console.log($scope.policies[i]);
+          continue;
+        }
+        g.add($rdf.sym("#"+i), RDF("type"), WAC('Authorization'));
+        g.add($rdf.sym("#"+i), WAC("accessTo"), $rdf.sym(decodeURIComponent($scope.uri)));
+        if (($scope.policies[i].classtype && $scope.policies[i].classtype == 'agentClass') || ($scope.policies[i].webid == FOAF("Agent").uri)) {
+          g.add($rdf.sym("#"+i), WAC("agentClass"), $rdf.sym($scope.policies[i].webid));
+        } else {
+          g.add($rdf.sym("#"+i), WAC("agent"), $rdf.sym($scope.policies[i].webid));
+        }
+        if ($scope.resType != 'File') {
+          g.add($rdf.sym("#"+i), WAC("defaultForNew"), $rdf.sym(decodeURIComponent($scope.uri))); 
+        }
+        if ($scope.policies[i].cat == "owner" && $scope.aclURI.length > 0) {
+          g.add($rdf.sym("#"+i), WAC("accessTo"), $rdf.sym(decodeURIComponent($scope.aclURI)));
+        }
+        for (var mode in $scope.policies[i].modes) {
+          if ($scope.policies[i].modes[mode] === true) {
+            g.add($rdf.sym("#"+i), WAC("mode"), WAC(mode));
           }
-          g.add($rdf.sym("#"+i), RDF("type"), WAC('Authorization'));
-          g.add($rdf.sym("#"+i), WAC("accessTo"), $rdf.sym(decodeURIComponent($scope.uri)));
-          if (($scope.policies[i].classtype && $scope.policies[i].classtype == 'agentClass') || ($scope.policies[i].webid == FOAF("Agent").uri)) {
-            g.add($rdf.sym("#"+i), WAC("agentClass"), $rdf.sym($scope.policies[i].webid));
-          } else {
-            g.add($rdf.sym("#"+i), WAC("agent"), $rdf.sym($scope.policies[i].webid));
-          }
-          if ($scope.policies[i].defaultForNew) {
-            g.add($rdf.sym("#"+i), WAC("defaultForNew"), $rdf.sym(decodeURIComponent($scope.uri))); 
-          }
-          if ($scope.policies[i].cat == "owner" && $scope.aclURI.length > 0) {
-            g.add($rdf.sym("#"+i), WAC("accessTo"), $rdf.sym(decodeURIComponent($scope.aclURI)));
-          }
-          for (var mode in $scope.policies[i].modes) {
-            if ($scope.policies[i].modes[mode] === true) {
-              g.add($rdf.sym("#"+i), WAC("mode"), WAC(mode));
-            }
-          }
+        }
       }
     }
     var s = new $rdf.Serializer(g).toN3(g);

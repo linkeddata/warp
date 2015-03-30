@@ -8,9 +8,9 @@ window.addEventListener('load', function () {
 });
 
 function notify(type, body, timeout) {
-  var icon = 'assets/favicon.ico';
+  var icon = 'assets/favicon.png';
   if (!timeout) {
-    var timeout = 5000;
+    var timeout = 2000;
   }
 
   // Let's check if the browser supports notifications

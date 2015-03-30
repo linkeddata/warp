@@ -238,13 +238,7 @@ angular.module("list/list.tpl.html", []).run(["$templateCache", function($templa
     "                    <button class=\"btn btn-sm\" ng-click=\"removeUser(policy.uri, policy.webid)\" ng-hide=\"policy.loading\"><i class=\"fa fa-trash-o orange\"></i></button>\n" +
     "                    <a href=\"{{policy.webid}}\" target=\"_blank\">{{trunc(policy.fullname, 24)}}</a>                    \n" +
     "                  </div>\n" +
-    "                  <div class=\"boxes pull-right\">\n" +
-    "                    <div ng-show=\"resType!='File'\">\n" +
-    "                      <input type=\"checkbox\" id=\"{{policy.$$hashKey}}\" ng-model=\"policy.defaultForNew\"/><label for=\"{{policy.$$hashKey}}\" class=\"mode-label\" tooltip-placement=\"bottom\" tooltip=\"Applies by default for all contents within this directory\">Default</label>\n" +
-    "                    </div>\n" +
-    "                    <br/>\n" +
-    "                  </div>\n" +
-    "                  <br/>\n" +
+    "                  <br>\n" +
     "                </div>\n" +
     "                <div class=\"spacer\">\n" +
     "                  <div class=\"policy\" ng-show=\"newUser['owner']\">\n" +
@@ -278,9 +272,6 @@ angular.module("list/list.tpl.html", []).run(["$templateCache", function($templa
     "                      <input type=\"checkbox\" ng-model=\"policy.modes.Read\"/><div class=\"mode-label\">Read</div>\n" +
     "                      <input type=\"checkbox\" ng-model=\"policy.modes.Write\"/><div class=\"mode-label\">Write</div>\n" +
     "                      <input type=\"checkbox\" ng-model=\"policy.modes.Append\"/><div class=\"mode-label\" tooltip-placement=\"bottom\" tooltip=\"Able to write without reading or deleting.\">Append</div>\n" +
-    "                      <div ng-show=\"resType!='File'\">\n" +
-    "                        <input type=\"checkbox\" id=\"{{policy.$$hashKey}}\" ng-model=\"policy.defaultForNew\"/><label for=\"{{policy.$$hashKey}}\" class=\"mode-label\" tooltip-placement=\"bottom\" tooltip=\"Applies by default for all contents within this directory\">Default</label>\n" +
-    "                      </div>\n" +
     "                      <br/>\n" +
     "                  </div>\n" +
     "                  <br/>\n" +
@@ -312,9 +303,6 @@ angular.module("list/list.tpl.html", []).run(["$templateCache", function($templa
     "                      <input type=\"checkbox\" ng-model=\"policy.modes.Read\"/><div class=\"mode-label\">Read</div>\n" +
     "                      <input type=\"checkbox\" ng-model=\"policy.modes.Write\"/><div class=\"mode-label\">Write</div>\n" +
     "                      <input type=\"checkbox\" ng-model=\"policy.modes.Append\"/><div class=\"mode-label\" tooltip-placement=\"bottom\" tooltip=\"Able to write without reading or deleting.\">Append</div>\n" +
-    "                      <div ng-show=\"resType!='File'\">\n" +
-    "                        <input type=\"checkbox\" id=\"{{policy.$$hashKey}}\" ng-model=\"policy.defaultForNew\"/><label for=\"{{policy.$$hashKey}}\" class=\"mode-label\" tooltip-placement=\"bottom\" tooltip=\"Applies by default for all contents within this directory\">Default</label>\n" +
-    "                      </div>\n" +
     "                      <br/>\n" +
     "                  </div>\n" +
     "                </div>\n" +
