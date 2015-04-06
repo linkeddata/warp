@@ -182,12 +182,18 @@ angular.module( 'App.list', [
 
       var dirs = g.statementsMatching(undefined, RDF("type"), POSIX("Directory"));
       for ( var i in dirs ) {
-        var root = (dirs[i].subject.uri.split('://')[1].split('/').length <= 2)?true:false;
+        var rootURI;
+        if (dirs[i].subject.value.indexOf('://') > 0) {
+          rootURI = dirs[i].subject.value.split('://')[1].split('/');
+        } else {
+          rootURI = dirs[i].subject.value.split('/');
+        }
+        var root = (rootURI.length <= 2)?true:false;
         var d = {};
-        if ( dirs[i].subject.uri == $scope.path ) {
+        if ( dirs[i].subject.value == $scope.path ) {
           d = {
             id: $scope.resources.length+1,
-            uri: dirs[i].subject.uri,
+            uri: dirs[i].subject.value,
             path: dirname(document.location.href)+'/',
             type: '-',
             name: '../',
@@ -202,8 +208,8 @@ angular.module( 'App.list', [
           var base = (document.location.href.charAt(document.location.href.length - 1) === '/')?document.location.href:document.location.href+'/';
           d = {
             id: $scope.resources.length+1,
-            uri: dirs[i].subject.uri,
-            path: base+encodeURIComponent(basename(dirs[i].subject.uri))+'/',
+            uri: dirs[i].subject.value,
+            path: base+encodeURIComponent(basename(dirs[i].subject.value))+'/',
             type: 'Directory',
             name: decodeURIComponent(basename(dirs[i].subject.value).replace("+", "%20")),
             mtime: g.any(dirs[i].subject, POSIX("mtime")).value,
@@ -219,8 +225,8 @@ angular.module( 'App.list', [
       for (i in files) {
         var f = {
           id: $scope.resources.length+1,
-          uri: files[i].subject.uri,
-          path: files[i].subject.uri,
+          uri: files[i].subject.value,
+          path: files[i].subject.value,
           type: 'File', // TODO: use the real type
           name: decodeURIComponent(basename(files[i].subject.value).replace("+", "%20")),
           mtime: g.any(files[i].subject, POSIX("mtime")).value,
