@@ -221,7 +221,7 @@ angular.module( 'App.list', [
       // either POSIX:File or RDFS:Resource
       // TODO: remove duplicates using something like http://lodash.com/docs#union
       var files = g.statementsMatching(undefined, RDF("type"), POSIX("File"));
-      files = (files.length > 0)?files.concat(g.statementsMatching(undefined, RDF("type"), RDFS("Resource"))):g.statementsMatching(undefined, RDF("type"), RDFS("Resource"));
+      // files = (files.length > 0)?files.concat(g.statementsMatching($scope.path, LDP("contains"), undefined)):g.statementsMatching(undefined, RDF("type"), RDFS("Resource"));
       for (i in files) {
         var f = {
           id: $scope.resources.length+1,
