@@ -976,12 +976,9 @@ var ModalACLEditor = function ($scope, $modalInstance, $http, resources, uri, ac
 
     var g = new $rdf.graph();
 
-    console.log("ACL URI:",$scope.aclURI, "URI", $scope.uri);
-
     if ($scope.policies.length > 0) {
       for (var i=0; i<$scope.policies.length;i++) {
         if ($scope.policies[i].cat == 'any' && !$scope.policies[i].modes || (!$scope.policies[i].modes.Read && !$scope.policies[i].modes.Write && !$scope.policies[i].modes.Append)) {
-          console.log($scope.policies[i]);
           continue;
         }
         g.add($rdf.sym("#"+i), RDF("type"), WAC('Authorization'));
@@ -1005,7 +1002,6 @@ var ModalACLEditor = function ($scope, $modalInstance, $http, resources, uri, ac
       }
     }
     var s = new $rdf.Serializer(g).toN3(g);
-    console.log(s);
     return s;
   };
 
