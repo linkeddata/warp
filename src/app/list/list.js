@@ -14,7 +14,7 @@
  */
 
 angular.module( 'App.list', [
-  'ui.router',  
+  'ui.router',
   'ngProgress',
   'ui.bootstrap',
   'ui.bootstrap.tpls',
@@ -115,7 +115,7 @@ angular.module( 'App.list', [
       notify('Warning', 'Please provide a valid URL');
     }
   };
-  
+
   $scope.changeLocation = function(path) {
     $location.path(path);
   };
@@ -173,7 +173,7 @@ angular.module( 'App.list', [
 
       $scope.userProfile = {};
       var user = xhr.getResponseHeader('User');
-      if (user && user.length > 0 && user.slice(0,4) == 'http') {        
+      if (user && user.length > 0 && user.slice(0,4) == 'http') {
         getProfile($scope, user, $scope.userProfile).then(function(profile){
           $scope.userProfile = profile;
           $scope.$apply();
@@ -209,7 +209,7 @@ angular.module( 'App.list', [
           d = {
             id: $scope.resources.length+1,
             uri: dirs[i].subject.value,
-            path: base+encodeURIComponent(basename(dirs[i].subject.value))+'/',
+            path: base+(basename(dirs[i].subject.value))+'/',
             type: 'Directory',
             name: decodeURIComponent(basename(dirs[i].subject.value).replace("+", "%20")),
             mtime: g.any(dirs[i].subject, POSIX("mtime")).value,
@@ -250,14 +250,15 @@ angular.module( 'App.list', [
 
   $scope.newDir = function(dirName) {
     // trim whitespaces
-    dirName = dirName.replace(/^\s+|\s+$/g, ""); 
+    dirName = dirName.replace(/^\s+|\s+$/g, "");
     $http({
-      method: 'PUT', 
-      url: $scope.path+encodeURIComponent(dirName),
+      method: 'POST',
+      url: $scope.path,
       data: '',
       headers: {
         'Content-Type': 'text/turtle',
-        'Link': '<http://www.w3.org/ns/ldp#BasicContainer>; rel="type"' 
+        'Link': '<http://www.w3.org/ns/ldp#BasicContainer>; rel="type"',
+        'Slug': dirName
       },
       withCredentials: true
     }).
@@ -285,14 +286,15 @@ angular.module( 'App.list', [
   $scope.newFile = function(fileName) {
     // trim whitespaces
     fileName = fileName.replace(/^\s+|\s+$/g, "");
-    var uri = $scope.path+encodeURIComponent(fileName);
+    var uri = $scope.path;
     $http({
-      method: 'PUT', 
+      method: 'POST',
       url: uri,
       data: '',
       headers: {
         'Content-Type': 'text/turtle',
-        'Link': '<http://www.w3.org/ns/ldp#Resource>; rel="type"'
+        'Link': '<http://www.w3.org/ns/ldp#Resource>; rel="type"',
+        'Slug': fileName
       },
       withCredentials: true
     }).
@@ -315,12 +317,12 @@ angular.module( 'App.list', [
       }
     });
   };
-  
+
   $scope.updateFile = function(fileContent) {
 	var uri = $scope.uri;
 	var data = $("#fileContent").val();
     $http({
-      method: 'PUT', 
+      method: 'PUT',
       url: uri,
       data: data,
       headers: {
@@ -351,7 +353,7 @@ angular.module( 'App.list', [
 
   $scope.deleteResource = function(resourceUri) {
     $http({
-      method: 'DELETE', 
+      method: 'DELETE',
       url: resourceUri,
       withCredentials: true
     }).
@@ -452,7 +454,7 @@ angular.module( 'App.list', [
       templateUrl: 'delete.html',
       controller: ModalDeleteCtrl,
       size: 'sm',
-      resolve: { 
+      resolve: {
         uri: function () {
           return uri;
         }
@@ -467,7 +469,7 @@ angular.module( 'App.list', [
     templateUrl: 'fileEditor.html',
     controller: ModalFileEditorCtrl,
     size: 'sm',
-    resolve: { 
+    resolve: {
         uri: function () {
           return uri;
         }
@@ -481,7 +483,7 @@ angular.module( 'App.list', [
       templateUrl: 'uploadfiles.html',
       controller: ModalUploadCtrl,
       size: 'sm',
-      resolve: { 
+      resolve: {
         url: function () {
           return url;
         },
@@ -586,7 +588,7 @@ angular.module( 'App.list', [
 
 var refreshResource = function(http, resources, uri) {
   http({
-    method: 'HEAD', 
+    method: 'HEAD',
     url: uri,
     withCredentials: true
   }).
@@ -692,7 +694,7 @@ var ModalFileEditorCtrl = function ($scope, $modalInstance, uri, $http) {
   };
 
   $http({
-    method: 'GET', 
+    method: 'GET',
     url: uri,
     headers: {
       'Accept': 'text/turtle'
@@ -713,7 +715,7 @@ var ModalFileEditorCtrl = function ($scope, $modalInstance, uri, $http) {
     } else {
       notify('Failed', status + " " + data);
     }
-  });  
+  });
 };
 
 var ModalDeleteCtrl = function ($scope, $modalInstance, uri) {
@@ -786,7 +788,7 @@ var ModalUploadCtrl = function ($scope, $modalInstance, $http, $upload, url, res
         // file is uploaded successfully
         $scope.filesUploading--;
         addResource($scope.resources, $scope.url+encodeURIComponent(file.name), 'File', file.size);
-        refreshResource($http, $scope.resources, $scope.url+encodeURIComponent(file.name));        
+        refreshResource($http, $scope.resources, $scope.url+encodeURIComponent(file.name));
     });
   };
 
@@ -819,11 +821,11 @@ var ModalACLEditor = function ($scope, $modalInstance, $http, resources, uri, ac
   $scope.policies = [];
   $scope.newUser = [];
   $scope.webidresults = [];
-  
+
   $scope.isFocused = true;
   $scope.loading = true;
   $scope.disableOk = false;
-    
+
   // Load ACL triples
   var RDF = $rdf.Namespace("http://www.w3.org/1999/02/22-rdf-syntax-ns#");
   var RDFS = $rdf.Namespace("http://www.w3.org/2000/01/rdf-schema#");
@@ -831,10 +833,10 @@ var ModalACLEditor = function ($scope, $modalInstance, $http, resources, uri, ac
   var FOAF = $rdf.Namespace("http://xmlns.com/foaf/0.1/");
 
   var g = $rdf.graph();
-  
+
   // add CORS proxy
   $rdf.Fetcher.crossSiteProxyTemplate=PROXY;
-  
+
   // truncate string
   $scope.trunc = function (str, size) {
     if (str !== undefined) {
@@ -843,7 +845,7 @@ var ModalACLEditor = function ($scope, $modalInstance, $http, resources, uri, ac
       return '';
     }
   };
-  
+
   $scope.findModes = function(modes) {
     var ret = {Read: false, Write: false, Append: false, Control: false};
     if (modes !== undefined && modes.length > 0) {
@@ -915,7 +917,7 @@ var ModalACLEditor = function ($scope, $modalInstance, $http, resources, uri, ac
 
           return true;
         } else {
-          return false; 
+          return false;
         }
       };
 
@@ -954,18 +956,18 @@ var ModalACLEditor = function ($scope, $modalInstance, $http, resources, uri, ac
     $scope.loading = false;
   }
 
-  
+
   $scope.haveCategory = function (cat) {
     if ($scope.policies) {
       for (var i=0; i<$scope.policies; i++) {
         if ($scope.policies[i].cat == cat) {
-          return true; 
+          return true;
         }
       }
     }
     return false;
   };
-  
+
   $scope.serializeTurtle = function () {
     var RDF = $rdf.Namespace("http://www.w3.org/1999/02/22-rdf-syntax-ns#");
     var RDFS = $rdf.Namespace("http://www.w3.org/2000/01/rdf-schema#");
@@ -974,6 +976,8 @@ var ModalACLEditor = function ($scope, $modalInstance, $http, resources, uri, ac
 
     var g = new $rdf.graph();
 
+    console.log("ACL URI:",$scope.aclURI, "URI", $scope.uri);
+
     if ($scope.policies.length > 0) {
       for (var i=0; i<$scope.policies.length;i++) {
         if ($scope.policies[i].cat == 'any' && !$scope.policies[i].modes || (!$scope.policies[i].modes.Read && !$scope.policies[i].modes.Write && !$scope.policies[i].modes.Append)) {
@@ -981,14 +985,14 @@ var ModalACLEditor = function ($scope, $modalInstance, $http, resources, uri, ac
           continue;
         }
         g.add($rdf.sym("#"+i), RDF("type"), WAC('Authorization'));
-        g.add($rdf.sym("#"+i), WAC("accessTo"), $rdf.sym(decodeURIComponent($scope.uri)));
+        g.add($rdf.sym("#"+i), WAC("accessTo"), $rdf.sym(encodeURI($scope.uri)));
         if (($scope.policies[i].classtype && $scope.policies[i].classtype == 'agentClass') || ($scope.policies[i].webid == FOAF("Agent").uri)) {
           g.add($rdf.sym("#"+i), WAC("agentClass"), $rdf.sym($scope.policies[i].webid));
         } else {
           g.add($rdf.sym("#"+i), WAC("agent"), $rdf.sym($scope.policies[i].webid));
         }
         if ($scope.resType != 'File') {
-          g.add($rdf.sym("#"+i), WAC("defaultForNew"), $rdf.sym(decodeURIComponent($scope.uri))); 
+          g.add($rdf.sym("#"+i), WAC("defaultForNew"), $rdf.sym(encodeURI($scope.uri)));
         }
         if ($scope.policies[i].cat == "owner" && $scope.aclURI.length > 0) {
           g.add($rdf.sym("#"+i), WAC("accessTo"), $rdf.sym(decodeURIComponent($scope.aclURI)));
@@ -1001,9 +1005,10 @@ var ModalACLEditor = function ($scope, $modalInstance, $http, resources, uri, ac
       }
     }
     var s = new $rdf.Serializer(g).toN3(g);
+    console.log(s);
     return s;
   };
-  
+
   // PUT the ACL policy on the server
   $scope.setAcl = function () {
     $scope.disableOk = true;
@@ -1030,9 +1035,9 @@ var ModalACLEditor = function ($scope, $modalInstance, $http, resources, uri, ac
       notify('Error - '+status, data);
     });
   };
-  
+
   $scope.removeUser = function (uri, webid) {
-    if ($scope.policies !== undefined) {      
+    if ($scope.policies !== undefined) {
       angular.forEach($scope.policies, function(policy, key) {
         if(policy.uri === uri && policy.webid === webid) {
           $scope.policies.splice(key,1);
@@ -1040,12 +1045,12 @@ var ModalACLEditor = function ($scope, $modalInstance, $http, resources, uri, ac
       });
     }
   };
-  
+
   $scope.showNewUser = function (cat) {
     $scope.newUser[cat] = {};
-    var newUser = $scope.newUser[cat];    
+    var newUser = $scope.newUser[cat];
   };
-  
+
   $scope.addNewUser = function(cat, webid) {
     var user = {};
     user.webid = webid;
@@ -1057,10 +1062,10 @@ var ModalACLEditor = function ($scope, $modalInstance, $http, resources, uri, ac
     user.fullname = webid;
     user.loading = getProfile($scope, webid, user);
     $scope.policies.push(user);
-    
+
     $scope.newUser[cat] = undefined;
   };
-  
+
   // attempt to find a person using webizen.org
   $scope.lookupWebID = function(query) {
     // get results from server
@@ -1090,7 +1095,7 @@ var ModalACLEditor = function ($scope, $modalInstance, $http, resources, uri, ac
         return matches;
     });
   };
-  
+
   $scope.cancelNewUser = function(cat) {
     delete $scope.newUser[cat];
   };
