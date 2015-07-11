@@ -138,7 +138,7 @@ angular.module( 'App.list', [
         path = (i===0)?elms[0]+'/':path+elms[i]+'/';
         var dir = {
           uri: '#/list/'+schema+'/'+path,
-          name: decodeURIComponent(elms[i])
+          name: decodeURI(elms[i])
         };
 
         $scope.breadCrumbs.push(dir);
@@ -211,7 +211,7 @@ angular.module( 'App.list', [
             uri: dirs[i].subject.value,
             path: base+(basename(dirs[i].subject.value))+'/',
             type: 'Directory',
-            name: decodeURIComponent(basename(dirs[i].subject.value).replace("+", "%20")),
+            name: decodeURI(basename(dirs[i].subject.value).replace("+", "%20")),
             mtime: g.any(dirs[i].subject, POSIX("mtime")).value,
             size: '-'
           };
@@ -228,7 +228,7 @@ angular.module( 'App.list', [
           uri: files[i].subject.value,
           path: files[i].subject.value,
           type: 'File', // TODO: use the real type
-          name: decodeURIComponent(basename(files[i].subject.value).replace("+", "%20")),
+          name: decodeURI(basename(files[i].subject.value).replace("+", "%20")),
           mtime: g.any(files[i].subject, POSIX("mtime")).value,
           size: g.any(files[i].subject, POSIX("size")).value
         };
@@ -424,7 +424,7 @@ angular.module( 'App.list', [
           if ($scope.resources.length === 0) {
             $scope.emptyDir = true;
           }
-          notify('Success', 'Deleted '+decodeURIComponent(basename(uri)+'.'));
+          notify('Success', 'Deleted '+decodeURI(basename(uri)+'.'));
         }
       }
     }
@@ -559,9 +559,9 @@ angular.module( 'App.list', [
             }
           });
         } else if (status == 401) {
-          notify('Forbidden', 'Authentication required to change permissions for: '+decodeURIComponent(basename(uri)));
+          notify('Forbidden', 'Authentication required to change permissions for: '+decodeURI(basename(uri)));
         } else if (status == 403) {
-          notify('Forbidden', 'You are not allowed to change permissions for: '+decodeURIComponent(basename(uri)));
+          notify('Forbidden', 'You are not allowed to change permissions for: '+decodeURI(basename(uri)));
         } else {
           notify('Failed - HTTP '+status, data, 5000);
         }
@@ -569,9 +569,9 @@ angular.module( 'App.list', [
     }).
     error(function(data, status) {
       if (status == 401) {
-        notify('Forbidden', 'Authentication required to change permissions for: '+decodeURIComponent(basename(uri)));
+        notify('Forbidden', 'Authentication required to change permissions for: '+decodeURI(basename(uri)));
       } else if (status == 403) {
-        notify('Forbidden', 'You are not allowed to change permissions for: '+decodeURIComponent(basename(uri)));
+        notify('Forbidden', 'You are not allowed to change permissions for: '+decodeURI(basename(uri)));
       } else {
         notify('Failed - HTTP '+status, data, 5000);
       }
@@ -609,7 +609,7 @@ var refreshResource = function(http, resources, uri) {
 var resourceExists = function (resources, uri) {
   if (resources.length > 0) {
     for(var i = resources.length - 1; i >= 0; i--){
-      if(decodeURIComponent(resources[i].uri) == decodeURIComponent(uri)) {
+      if(decodeURI(resources[i].uri) == decodeURI(uri)) {
         return resources[i];
       }
     }
@@ -620,7 +620,7 @@ var resourceExists = function (resources, uri) {
 var addResource = function (resources, uri, type, size) {
   // Add resource to the list
   var base = (document.location.href.charAt(document.location.href.length - 1) === '/')?document.location.href:document.location.href+'/';
-  var path = (type === 'File')?dirname(uri)+'/'+encodeURIComponent(basename(uri)):base+basename(uri)+'/';
+  var path = (type === 'File')?dirname(uri)+'/'+encodeURI(basename(uri)):base+basename(uri)+'/';
   var now = new Date().getTime();
   size = (size)?size:'-';
   var f = {
@@ -628,7 +628,7 @@ var addResource = function (resources, uri, type, size) {
     uri: uri,
     path: path,
     type: type, // TODO: use the real type
-    name: decodeURIComponent(basename(uri)),
+    name: decodeURI(basename(uri)),
     mtime: now,
     size: size
   };
@@ -720,7 +720,7 @@ var ModalFileEditorCtrl = function ($scope, $modalInstance, uri, $http) {
 
 var ModalDeleteCtrl = function ($scope, $modalInstance, uri) {
   $scope.delUri = uri;
-  $scope.resource = decodeURIComponent(basename(uri));
+  $scope.resource = decodeURI(basename(uri));
   $scope.deleteResource = function() {
     $modalInstance.close($scope.delUri);
   };
@@ -752,7 +752,7 @@ var ModalUploadCtrl = function ($scope, $modalInstance, $http, $upload, url, res
   $scope.remove = function(index) {
     if ($scope.selectedFiles.length > 0) {
       for (var i = $scope.selectedFiles.length - 1; i >= 0; i--) {
-        if(decodeURIComponent($scope.selectedFiles[i].name) == decodeURIComponent(index)) {
+        if(decodeURI($scope.selectedFiles[i].name) == decodeURI(index)) {
           $scope.selectedFiles.splice(i, 1);
           $scope.uploading[index].abort();
           $scope.uploading[index] = null;
@@ -787,8 +787,8 @@ var ModalUploadCtrl = function ($scope, $modalInstance, $http, $upload, url, res
       }).success(function(data, status, headers, config) {
         // file is uploaded successfully
         $scope.filesUploading--;
-        addResource($scope.resources, $scope.url+encodeURIComponent(file.name), 'File', file.size);
-        refreshResource($http, $scope.resources, $scope.url+encodeURIComponent(file.name));
+        addResource($scope.resources, $scope.url+encodeURI(file.name), 'File', file.size);
+        refreshResource($http, $scope.resources, $scope.url+encodeURI(file.name));
     });
   };
 
@@ -817,7 +817,7 @@ var ModalACLEditor = function ($scope, $modalInstance, $http, resources, uri, ac
   $scope.aclURI = aclURI;
   $scope.resType = type;
   $scope.gotOwner = false;
-  $scope.resource = decodeURIComponent(basename(uri));
+  $scope.resource = decodeURI(basename(uri));
   $scope.policies = [];
   $scope.newUser = [];
   $scope.webidresults = [];
@@ -975,24 +975,25 @@ var ModalACLEditor = function ($scope, $modalInstance, $http, resources, uri, ac
     var FOAF = $rdf.Namespace("http://xmlns.com/foaf/0.1/");
 
     var g = new $rdf.graph();
-
+    $scope.uri = encodeURI($scope.uri);
+    console.log($scope.uri, $scope.aclURI);
     if ($scope.policies.length > 0) {
       for (var i=0; i<$scope.policies.length;i++) {
         if ($scope.policies[i].cat == 'any' && !$scope.policies[i].modes || (!$scope.policies[i].modes.Read && !$scope.policies[i].modes.Write && !$scope.policies[i].modes.Append)) {
           continue;
         }
         g.add($rdf.sym("#"+i), RDF("type"), WAC('Authorization'));
-        g.add($rdf.sym("#"+i), WAC("accessTo"), $rdf.sym(encodeURI($scope.uri)));
+        g.add($rdf.sym("#"+i), WAC("accessTo"), $rdf.sym(decodeURI($scope.uri)));
         if (($scope.policies[i].classtype && $scope.policies[i].classtype == 'agentClass') || ($scope.policies[i].webid == FOAF("Agent").uri)) {
           g.add($rdf.sym("#"+i), WAC("agentClass"), $rdf.sym($scope.policies[i].webid));
         } else {
           g.add($rdf.sym("#"+i), WAC("agent"), $rdf.sym($scope.policies[i].webid));
         }
         if ($scope.resType != 'File') {
-          g.add($rdf.sym("#"+i), WAC("defaultForNew"), $rdf.sym(encodeURI($scope.uri)));
+          g.add($rdf.sym("#"+i), WAC("defaultForNew"), $rdf.sym(decodeURI($scope.uri)));
         }
         if ($scope.policies[i].cat == "owner" && $scope.aclURI.length > 0) {
-          g.add($rdf.sym("#"+i), WAC("accessTo"), $rdf.sym(decodeURIComponent($scope.aclURI)));
+          g.add($rdf.sym("#"+i), WAC("accessTo"), $rdf.sym(decodeURI($scope.aclURI)));
         }
         for (var mode in $scope.policies[i].modes) {
           if ($scope.policies[i].modes[mode] === true) {
@@ -1002,6 +1003,7 @@ var ModalACLEditor = function ($scope, $modalInstance, $http, resources, uri, ac
       }
     }
     var s = new $rdf.Serializer(g).toN3(g);
+    console.log(s);
     return s;
   };
 
