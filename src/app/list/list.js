@@ -72,6 +72,11 @@ angular.module( 'App.list', [
     }
   };
 })
+.filter('toURL', function() {
+  return function(string) {
+    return 'https://linkeddata.github.io/profile-editor/#/profile/view?webid='+encodeURIComponent(string);
+  };
+})
 
 /**
  * Directives

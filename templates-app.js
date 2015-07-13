@@ -40,7 +40,7 @@ angular.module("list/list.tpl.html", []).run(["$templateCache", function($templa
     "        </td>\n" +
     "        <td class=\"pull-right vmiddle white\">\n" +
     "          <div tooltip-placement=\"bottom\" tooltip=\"{{userProfile.fullname}}\" class=\"avatar-frame\" ng-show=\"userProfile.webid\">\n" +
-    "            <a href=\"{{userProfile.webid}}\" target=\"_blank\"><img ng-src=\"{{userProfile.picture}}\"></a>\n" +
+    "            <a href=\"{{userProfile.webid|toURL}}\" target=\"_blank\"><img ng-src=\"{{userProfile.picture}}\"></a>\n" +
     "          </div>\n" +
     "        </td>\n" +
     "      </tr>\n" +
