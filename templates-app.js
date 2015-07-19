@@ -27,7 +27,7 @@ angular.module("list/list.tpl.html", []).run(["$templateCache", function($templa
     "          </div>\n" +
     "        </td>\n" +
     "        <td class=\"vtop pull-left\">\n" +
-    "          <button type=\"button\" class=\"btn btn-info\" tooltip-placement=\"bottom\" tooltip=\"Pick a different storage location\" ng-click=\"changeLocation('/list/')\"><i class=\"fa fa-2x fa-database white\"></i></button>\n" +
+    "          <button type=\"button\" class=\"btn btn-info\" tooltip-placement=\"bottom\" tooltip=\"Pick a different storage location\" ng-click=\"openNewLocation()\"><i class=\"fa fa-2x fa-database white\"></i></button>\n" +
     "        </td>\n" +
     "        <td class=\"pull-left\">\n" +
     "          <div id=\"crumbs\" class=\"collapse navbar-collapse\">\n" +
@@ -47,7 +47,7 @@ angular.module("list/list.tpl.html", []).run(["$templateCache", function($templa
     "    </table>\n" +
     "    </div>\n" +
     "  </div>\n" +
-    "  \n" +
+    "\n" +
     "  <div class=\"col-md-12\" ng-show=\"listLocation === false\">\n" +
     "    <div class=\"clear-70\"></div>\n" +
     "    <h1>Please provide a location for the data server:</h1>\n" +
@@ -60,7 +60,7 @@ angular.module("list/list.tpl.html", []).run(["$templateCache", function($templa
     "      </form>\n" +
     "    </div>\n" +
     "  </div>\n" +
-    "  \n" +
+    "\n" +
     "  <div class=\"index\" ng-show=\"listLocation === true\">\n" +
     "    <table class=\"box-shadow\">\n" +
     "      <thead>\n" +
@@ -95,6 +95,27 @@ angular.module("list/list.tpl.html", []).run(["$templateCache", function($templa
     "    </table>\n" +
     "  </div>\n" +
     "\n" +
+    "\n" +
+    "  <!-- New location modal -->\n" +
+    "  <script type=\"text/ng-template\" id=\"newlocation.html\">\n" +
+    "    <div>\n" +
+    "      <div class=\"modal-header\">\n" +
+    "            <h3 class=\"modal-title\">Please provide a location for the data server:</h3>\n" +
+    "        </div>\n" +
+    "        <div class=\"modal-body\">\n" +
+    "          <form name=\"newLocName\">\n" +
+    "            <fieldset>\n" +
+    "              <input type=\"text\" ng-model=\"locName\" name=\"locName\" id=\"locName\" class=\"nginput pull-left\" placeholder=\"https://example.org/\" ng-focus=\"isFocused\" ng-keypress=\"($event.which === 13)?newLoc(locName):0\">\n" +
+    "            </fieldset>\n" +
+    "          </form>\n" +
+    "        </div>\n" +
+    "        <div class=\"modal-footer\">\n" +
+    "          <button class=\"btn btn-primary\" ng-click=\"newLoc(locName)\">OK</button>\n" +
+    "          <button class=\"btn btn-default\" ng-click=\"cancel()\">Cancel</button>\n" +
+    "        </div>\n" +
+    "    </div>\n" +
+    "  </script>\n" +
+    "\n" +
     "  <!-- New dir modal -->\n" +
     "  <script type=\"text/ng-template\" id=\"newdir.html\">\n" +
     "    <div>\n" +
@@ -104,7 +125,7 @@ angular.module("list/list.tpl.html", []).run(["$templateCache", function($templa
     "        <div class=\"modal-body\">\n" +
     "          <form name=\"newDirName\">\n" +
     "            <fieldset>\n" +
-    "              <input type=\"text\" ng-model=\"dirName\" name=\"dirName\" id=\"dirName\" class=\"nginput\" placeholder=\"dir name..\" ng-focus=\"isFocused\" ng-keypress=\"($event.which === 13)?newDir(dirName):0\" />\n" +
+    "              <input type=\"text\" ng-model=\"dirName\" name=\"dirName\" id=\"dirName\" class=\"nginput\" placeholder=\"dir name..\" ng-focus=\"isFocused\" ng-keypress=\"($event.which === 13)?newDir(dirName):0\">\n" +
     "              <span ng-hide=\"newDirName.dirName.$valid\">Only use: a-z A-Z 0-9 _ -</span>\n" +
     "            </fieldset>\n" +
     "          </form>\n" +
@@ -129,7 +150,6 @@ angular.module("list/list.tpl.html", []).run(["$templateCache", function($templa
     "              <!-- <span ng-hide=\"newFileName.fileName.$valid\">Only use: a-z A-Z 0-9 _ - .</span> -->\n" +
     "            </fieldset>\n" +
     "          </form>\n" +
-    "          <br/><small class=\"orange\">Warning: creating a new file may overwrite an existing one with the same name!</small>\n" +
     "        </div>\n" +
     "        <div class=\"modal-footer\">\n" +
     "          <button class=\"btn btn-primary\" ng-click=\"newFile(fileName)\">OK</button>\n" +
@@ -137,7 +157,7 @@ angular.module("list/list.tpl.html", []).run(["$templateCache", function($templa
     "        </div>\n" +
     "    </div>\n" +
     "  </script>\n" +
-    "  \n" +
+    "\n" +
     "  <!-- File editor modal -->\n" +
     "  <script type=\"text/ng-template\" id=\"fileEditor.html\">\n" +
     "    <div>\n" +
@@ -214,13 +234,13 @@ angular.module("list/list.tpl.html", []).run(["$templateCache", function($templa
     "        </div>\n" +
     "    </div>\n" +
     "  </script>\n" +
-    "  \n" +
+    "\n" +
     "  <!-- ACL editor modal -->\n" +
     "  <script type=\"text/ng-template\" id=\"acleditor.html\">\n" +
     "    <div>\n" +
     "      <div class=\"modal-header\">\n" +
     "        <h3 class=\"modal-title\">Permissions for <strong>{{resource}}</strong></h3>\n" +
-    "        <img ng-src=\"assets/loading.gif\" ng-show=\"loading\">  \n" +
+    "        <img ng-src=\"assets/loading.gif\" ng-show=\"loading\">\n" +
     "      </div>\n" +
     "        <div class=\"modal-body\">\n" +
     "          <table class=\"full-width\">\n" +
@@ -241,7 +261,7 @@ angular.module("list/list.tpl.html", []).run(["$templateCache", function($templa
     "                  <div class=\"pull-left\">\n" +
     "                    <img ng-src=\"assets/loading.gif\" ng-show=\"policy.loading\" />\n" +
     "                    <button class=\"btn btn-sm\" ng-click=\"removeUser(policy.uri, policy.webid)\" ng-hide=\"policy.loading\"><i class=\"fa fa-trash-o orange\"></i></button>\n" +
-    "                    <a href=\"{{policy.webid}}\" target=\"_blank\">{{trunc(policy.fullname, 24)}}</a>                    \n" +
+    "                    <a href=\"{{policy.webid}}\" target=\"_blank\">{{trunc(policy.fullname, 24)}}</a>\n" +
     "                  </div>\n" +
     "                  <br>\n" +
     "                </div>\n" +
@@ -318,9 +338,9 @@ angular.module("list/list.tpl.html", []).run(["$templateCache", function($templa
     "        <div class=\"modal-footer\">\n" +
     "          <button class=\"btn btn-primary\" ng-click=\"setAcl()\" ng-disabled=\"disableOk\">\n" +
     "            <span ng-hide=\"disableOk\">\n" +
-    "              Save \n" +
+    "              Save\n" +
     "            </span>\n" +
-    "             \n" +
+    "\n" +
     "            <span ng-show=\"disableOk\">\n" +
     "              Saving\n" +
     "              <i class=\"fa fa-spinner fa-spin\"></i>\n" +
@@ -336,7 +356,7 @@ angular.module("list/list.tpl.html", []).run(["$templateCache", function($templa
     "        <span bind-html-unsafe=\"match.name | typeaheadHighlight:query\"></span>\n" +
     "    </a>\n" +
     "  </script>\n" +
-    "  \n" +
+    "\n" +
     "</div>\n" +
     "");
 }]);

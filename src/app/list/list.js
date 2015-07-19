@@ -436,6 +436,15 @@ angular.module( 'App.list', [
   };
 
   // New dir dialog
+  $scope.openNewLocation = function () {
+    var modalInstance = $modal.open({
+      templateUrl: 'newlocation.html',
+      controller: ModalNewLocationCtrl,
+      size: 'sm'
+    });
+    modalInstance.result.then($scope.prepareList);
+  };
+  // New dir dialog
   $scope.openNewDir = function () {
     var modalInstance = $modal.open({
       templateUrl: 'newdir.html',
@@ -643,8 +652,24 @@ var addResource = function (resources, uri, type, size) {
   }
 };
 
-
 // Modal Ctrls
+var ModalNewLocationCtrl = function ($scope, $modalInstance) {
+  $scope.isFocused = true;
+  $scope.newLoc = "";
+
+  $scope.newLoc = function(locName) {
+    $modalInstance.close(locName);
+  };
+
+  $scope.ok = function () {
+    $modalInstance.close();
+  };
+
+  $scope.cancel = function () {
+    $modalInstance.dismiss('cancel');
+  };
+};
+
 var ModalNewDirCtrl = function ($scope, $modalInstance) {
   $scope.isFocused = true;
 
