@@ -74,7 +74,7 @@ angular.module("list/list.tpl.html", []).run(["$templateCache", function($templa
     "      </tr>\n" +
     "      <tr ng-repeat=\"res in resources|orderBy:['type','name'] track by res.id\">\n" +
     "          <td colspan=\"{{res.type==='-'?3:1}}\">\n" +
-    "            <a href=\"{{res.path}}\" target=\"{{res.type=='File'?'_blank':''}}\"><i class=\"fa fa-fw vmiddle\" ng-class=\"res.type=='Directory'||res.type==='-'?'fa-folder-open-o':'fa-file-o'\"></i> {{res.name}}</a>\n" +
+    "            <a href=\"{{res.path}}\" target=\"{{res.type=='File'?'_blank':''}}\"><i class=\"fa fa-fw vmiddle\" ng-class=\"res.type=='Directory'||res.type==='-'?'fa-folder-open-o':'fa-file-o'\"></i>{{res.name}}</a>\n" +
     "          </td>\n" +
     "          <td ng-hide=\"res.type==='-'\">{{res.size|fileSize}}</td>\n" +
     "          <td ng-hide=\"res.type==='-'\"><div tooltip-placement=\"bottom\" tooltip=\"{{res.mtime|classicDate}}\">{{res.mtime|fromNow}}</div></td>\n" +
@@ -311,9 +311,9 @@ angular.module("list/list.tpl.html", []).run(["$templateCache", function($templa
     "                    </div>\n" +
     "                  </div>\n" +
     "                  <div class=\"boxes pull-right\">\n" +
-    "                      <input type=\"checkbox\" ng-model=\"policy.modes.Read\"/><div class=\"mode-label\">Read</div>\n" +
-    "                      <input type=\"checkbox\" ng-model=\"policy.modes.Write\"/><div class=\"mode-label\">Write</div>\n" +
-    "                      <input type=\"checkbox\" ng-model=\"policy.modes.Append\"/><div class=\"mode-label\" tooltip-placement=\"bottom\" tooltip=\"Able to write without reading or deleting.\">Append</div>\n" +
+    "                      <input type=\"checkbox\" ng-model=\"policy.modes.Read\" class=\"inline-block\"><div class=\"inline-block mode-label\">Read</div>\n" +
+    "                      <input type=\"checkbox\" ng-model=\"policy.modes.Write\" class=\"inline-block\"><div class=\"inline-block mode-label\">Write</div>\n" +
+    "                      <input type=\"checkbox\" ng-model=\"policy.modes.Append\" class=\"inline-block\"><div class=\"inline-block mode-label\" tooltip-placement=\"bottom\" tooltip=\"Able to write without reading or deleting.\">Append</div>\n" +
     "                      <br/>\n" +
     "                  </div>\n" +
     "                  <br/>\n" +
@@ -350,9 +350,9 @@ angular.module("list/list.tpl.html", []).run(["$templateCache", function($templa
     "              <td class=\"vtop policies\">\n" +
     "                <div ng-repeat=\"policy in policies|filter:{cat: 'any'}|limitTo:1\">\n" +
     "                  <div class=\"boxes pull-right\">\n" +
-    "                      <input type=\"checkbox\" ng-model=\"policy.modes.Read\"/><div class=\"mode-label\">Read</div>\n" +
-    "                      <input type=\"checkbox\" ng-model=\"policy.modes.Write\"/><div class=\"mode-label\">Write</div>\n" +
-    "                      <input type=\"checkbox\" ng-model=\"policy.modes.Append\"/><div class=\"mode-label\" tooltip-placement=\"bottom\" tooltip=\"Able to write without reading or deleting.\">Append</div>\n" +
+    "                      <input type=\"checkbox\" ng-model=\"policy.modes.Read\" class=\"inline-block\"><div class=\"inline-block mode-label\">Read</div>\n" +
+    "                      <input type=\"checkbox\" ng-model=\"policy.modes.Write\" class=\"inline-block\"><div class=\"inline-block mode-label\">Write</div>\n" +
+    "                      <input type=\"checkbox\" ng-model=\"policy.modes.Append\" class=\"inline-block\"><div class=\"inline-block mode-label\" tooltip-placement=\"bottom\" tooltip=\"Able to write without reading or deleting.\">Append</div>\n" +
     "                      <br/>\n" +
     "                  </div>\n" +
     "                </div>\n" +

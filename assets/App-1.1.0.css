@@ -6127,6 +6127,7 @@ button.close {
  */
 body {
   background-image: url('background.png');
+  font-size: 12px;
 }
 /**
  * Typography
@@ -6145,6 +6146,12 @@ pre,
   background-color: #EFEFEF;
   border: 1px solid #DADADA;
   border-radius: 3px;
+}
+.truncate {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
 }
 code {
   padding: 0 3px;
