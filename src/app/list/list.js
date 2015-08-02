@@ -170,86 +170,88 @@ angular.module( 'App.list', [
       if (!ok) {
         ngProgress.complete();
         $scope.listLocation = false;
+        if (xhr.status === 401 || xhr.status === 403) {
+          $scope.noPerm = true;
+        }
+        console.log($scope.emptyDir);
         notify('Error', 'Could not fetch dir listing. HTTP '+xhr.status);
       } else {
         $scope.listLocation = true;
-      }
-      $scope.$apply();
 
-      $scope.userProfile = {};
-      var user = xhr.getResponseHeader('User');
-      if (user && user.length > 0 && user.slice(0,4) == 'http') {
-        getProfile($scope, user, $scope.userProfile).then(function(profile){
-          $scope.userProfile = profile;
-          $scope.$apply();
-        });
-      }
+        $scope.userProfile = {};
+        var user = xhr.getResponseHeader('User');
+        if (user && user.length > 0 && user.slice(0,4) == 'http') {
+          getProfile($scope, user, $scope.userProfile).then(function(profile){
+            $scope.userProfile = profile;
+            $scope.$apply();
+          });
+        }
 
-      var dirs = g.statementsMatching(undefined, RDF("type"), POSIX("Directory"));
-      for ( var i in dirs ) {
-        if (key.length > 0 && dirs[i].subject.value.indexOf(key) >= 0) {
-          dirs[i].subject.value = dirs[i].subject.value.slice(0, -key.length);
-        }
-        var rootURI;
-        if (dirs[i].subject.value.indexOf('://') > 0) {
-          rootURI = dirs[i].subject.value.split('://')[1].split('/');
-        } else {
-          rootURI = dirs[i].subject.value.split('/');
-        }
-        var root = (rootURI.length <= 2)?true:false;
-        var d = {};
-        var base = '#/list/';
-        if ( dirs[i].subject.value == $scope.path ) {
-          d = {
-            id: $scope.resources.length+1,
-            uri: dirs[i].subject.value,
-            path: base+dirname($stateParams.path)+'/',
-            type: '-',
-            name: '../',
-            mtime: g.any(dirs[i].subject, POSIX("mtime")).value,
-            size: '-'
-          };
-          if (root) {
-            d.name = '/';
-            d.path = document.location.href;
+        var dirs = g.statementsMatching(undefined, RDF("type"), POSIX("Directory"));
+        for ( var i in dirs ) {
+          if (key.length > 0 && dirs[i].subject.value.indexOf(key) >= 0) {
+            dirs[i].subject.value = dirs[i].subject.value.slice(0, -key.length);
           }
-        } else {
-          // var base = (document.location.href.charAt(document.location.href.length - 1) === '/')?document.location.href:document.location.href+'/';
-          base += $stateParams.path;
-          d = {
-            id: $scope.resources.length+1,
-            uri: dirs[i].subject.value,
-            path: base+(basename(dirs[i].subject.value))+'/',
-            type: 'Directory',
-            name: decodeURI(basename(dirs[i].subject.value).replace("+", "%20")),
-            mtime: g.any(dirs[i].subject, POSIX("mtime")).value,
-            size: '-'
-          };
+          var rootURI;
+          if (dirs[i].subject.value.indexOf('://') > 0) {
+            rootURI = dirs[i].subject.value.split('://')[1].split('/');
+          } else {
+            rootURI = dirs[i].subject.value.split('/');
+          }
+          var root = (rootURI.length <= 2)?true:false;
+          var d = {};
+          var base = '#/list/';
+          if ( dirs[i].subject.value == $scope.path ) {
+            d = {
+              id: $scope.resources.length+1,
+              uri: dirs[i].subject.value,
+              path: base+dirname($stateParams.path)+'/',
+              type: '-',
+              name: '../',
+              mtime: g.any(dirs[i].subject, POSIX("mtime")).value,
+              size: '-'
+            };
+            if (root) {
+              d.name = '/';
+              d.path = document.location.href;
+            }
+          } else {
+            // var base = (document.location.href.charAt(document.location.href.length - 1) === '/')?document.location.href:document.location.href+'/';
+            base += $stateParams.path;
+            d = {
+              id: $scope.resources.length+1,
+              uri: dirs[i].subject.value,
+              path: base+(basename(dirs[i].subject.value))+'/',
+              type: 'Directory',
+              name: decodeURI(basename(dirs[i].subject.value).replace("+", "%20")),
+              mtime: g.any(dirs[i].subject, POSIX("mtime")).value,
+              size: '-'
+            };
+          }
+          $scope.resources.push(d);
         }
-        $scope.resources.push(d);
+        // either POSIX:File or RDFS:Resource
+        // TODO: remove duplicates using something like http://lodash.com/docs#union
+        var files = g.statementsMatching(undefined, RDF("type"), POSIX("File"));
+        // files = (files.length > 0)?files.concat(g.statementsMatching($scope.path, LDP("contains"), undefined)):g.statementsMatching(undefined, RDF("type"), RDFS("Resource"));
+        for (i in files) {
+          var f = {
+            id: $scope.resources.length+1,
+            uri: files[i].subject.value,
+            path: files[i].subject.value,
+            type: 'File', // TODO: use the real type
+            name: decodeURI(basename(files[i].subject.value).replace("+", "%20")),
+            mtime: g.any(files[i].subject, POSIX("mtime")).value,
+            size: g.any(files[i].subject, POSIX("size")).value
+          };
+          $scope.resources.push(f);
+          $scope.$apply();
+        }
+        if ($scope.resources.length === 0) {
+          $scope.emptyDir = true;
+        }
+        ngProgress.complete();
       }
-      // either POSIX:File or RDFS:Resource
-      // TODO: remove duplicates using something like http://lodash.com/docs#union
-      var files = g.statementsMatching(undefined, RDF("type"), POSIX("File"));
-      // files = (files.length > 0)?files.concat(g.statementsMatching($scope.path, LDP("contains"), undefined)):g.statementsMatching(undefined, RDF("type"), RDFS("Resource"));
-      for (i in files) {
-        var f = {
-          id: $scope.resources.length+1,
-          uri: files[i].subject.value,
-          path: files[i].subject.value,
-          type: 'File', // TODO: use the real type
-          name: decodeURI(basename(files[i].subject.value).replace("+", "%20")),
-          mtime: g.any(files[i].subject, POSIX("mtime")).value,
-          size: g.any(files[i].subject, POSIX("size")).value
-        };
-        $scope.resources.push(f);
-        $scope.$apply();
-      }
-      if ($scope.resources.length === 0) {
-        $scope.emptyDir = true;
-      }
-      ngProgress.complete();
-
       $scope.$apply();
     });
   };

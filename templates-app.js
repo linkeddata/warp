@@ -48,9 +48,9 @@ angular.module("list/list.tpl.html", []).run(["$templateCache", function($templa
     "    </div>\n" +
     "  </div>\n" +
     "\n" +
-    "  <div class=\"col-md-12\" ng-show=\"listLocation === false\">\n" +
+    "  <div class=\"col-md-12\" ng-hide=\"listLocation\">\n" +
     "    <div class=\"clear-70\"></div>\n" +
-    "    <h1>Please provide a location for the data server:</h1>\n" +
+    "    <h1>Please provide a location for the LDP server:</h1>\n" +
     "    <div class=\"prepare-list\">\n" +
     "      <form name=\"preList\">\n" +
     "        <div class=\"btn-group half-width\">\n" +
@@ -61,7 +61,7 @@ angular.module("list/list.tpl.html", []).run(["$templateCache", function($templa
     "    </div>\n" +
     "  </div>\n" +
     "\n" +
-    "  <div class=\"index\" ng-show=\"listLocation === true\">\n" +
+    "  <div class=\"index\" ng-show=\"listLocation\">\n" +
     "    <table class=\"box-shadow\">\n" +
     "      <thead>\n" +
     "          <th class=\"filename\">Name</th>\n" +
@@ -70,7 +70,7 @@ angular.module("list/list.tpl.html", []).run(["$templateCache", function($templa
     "          <th class=\"right\">More</th>\n" +
     "      </thead>\n" +
     "      <tr ng-show=\"emptyDir\">\n" +
-    "        <td colspan=\"4\"><h2>No files found</h2></td>\n" +
+    "        <td colspan=\"4\"><h2>Cannot list contents <span ng-show=\"noPerm\">(access denied)</span></h2></td>\n" +
     "      </tr>\n" +
     "      <tr ng-repeat=\"res in resources|orderBy:['type','name'] track by res.id\">\n" +
     "          <td colspan=\"{{res.type==='-'?3:1}}\">\n" +
