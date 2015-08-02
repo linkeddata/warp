@@ -75,8 +75,8 @@ var getProfile = function(scope, uri, profile, forWebID) {
           }
         }
         profile.webid = webid;
-        if (!profile.classtype || profile.classtype.length === 0) {
-          profile.classtype = classType;
+        if (!profile.predicate || profile.predicate.length === 0) {
+          profile.predicate = classType;
         }
         if (!profile.fullname || profile.fullname.length === 0 || profile.fullname === webid) {
           profile.fullname = name;
@@ -85,7 +85,7 @@ var getProfile = function(scope, uri, profile, forWebID) {
           profile.picture = pic;
         }
         profile.loading = false;
-        
+        scope.$apply();
         resolve(profile);
       }
     });
@@ -107,7 +107,7 @@ humanFileSize = function (bytes, si) {
     if (bytes == '-') {
         return bytes;
     }
-    
+
     var thresh = (si)?1000:1024;
     if (bytes < thresh) {
         return bytes + ' B';

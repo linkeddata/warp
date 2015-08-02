@@ -6366,6 +6366,9 @@ h2 {
 .vbottom {
   vertical-align: bottom;
 }
+.inline-block {
+  display: inline-block;
+}
 /**
  * Buttons
  */

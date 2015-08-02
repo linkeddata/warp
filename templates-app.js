@@ -260,8 +260,9 @@ angular.module("list/list.tpl.html", []).run(["$templateCache", function($templa
     "                <div class=\"policy\" ng-repeat=\"policy in policies|filter:{cat: 'owner'}\">\n" +
     "                  <div class=\"pull-left\">\n" +
     "                    <img ng-src=\"assets/loading.gif\" ng-show=\"policy.loading\" />\n" +
-    "                    <button class=\"btn btn-sm\" ng-click=\"removeUser(policy.uri, policy.webid)\" ng-hide=\"policy.loading\"><i class=\"fa fa-trash-o orange\"></i></button>\n" +
-    "                    <a href=\"{{policy.webid}}\" target=\"_blank\">{{trunc(policy.fullname, 24)}}</a>\n" +
+    "                    <button class=\"btn btn-sm\" ng-click=\"removePolicy(policy.$$hashKey)\" ng-hide=\"policy.loading\"><i class=\"fa fa-trash-o orange\"></i></button>\n" +
+    "                    <a href=\"{{policy.webid}}\" target=\"_blank\" ng-show=\"policy.webid\">{{trunc(policy.fullname, 24)}}</a>\n" +
+    "                    <div class=\"inline-block\" ng-show=\"policy.key\">Key: {{trunc(policy.fullname, 24)}}</div>\n" +
     "                  </div>\n" +
     "                  <br>\n" +
     "                </div>\n" +
@@ -273,7 +274,15 @@ angular.module("list/list.tpl.html", []).run(["$templateCache", function($templa
     "                    <button class=\"btn btn-sm\" ng-click=\"cancelNewUser('owner')\"><i class=\"fa fa-2x fa-times-circle-o\"></i></button>\n" +
     "                    <br/>\n" +
     "                  </div>\n" +
-    "                  <button class=\"btn btn-primary\" ng-click=\"showNewUser('owner')\" ng-hide=\"newUser['owner']\">Add</button>\n" +
+    "                  <div class=\"policy\" ng-show=\"newKey['owner']\">\n" +
+    "                    <input class=\"new-user vmiddle\" type=\"text\" ng-focus=\"isFocused\" ng-model=\"newKey['owner'].key\">\n" +
+    "                    <button class=\"btn btn-sm btn-primary\" ng-click=\"generateNewKey(newKey['owner'])\" tooltip-placement=\"bottom\" tooltip=\"Generate a random key\"><i class=\"fa fa-2x fa-key\"></i></button>\n" +
+    "                    <button class=\"btn btn-sm btn-primary\" ng-click=\"addNewKey('owner', newKey['owner'].key)\" ng-disabled=\"newKey['owner'].key.length === 0\"><i class=\"fa fa-2x fa-check-circle-o\"></i></button>\n" +
+    "                    <button class=\"btn btn-sm\" ng-click=\"cancelNewKey('owner')\"><i class=\"fa fa-2x fa-times-circle-o\"></i></button>\n" +
+    "                    <br/>\n" +
+    "                  </div>\n" +
+    "                  <button class=\"btn btn-primary\" ng-click=\"showNewUser('owner')\" ng-hide=\"newUser['owner']\">Add user</button>\n" +
+    "                  <button class=\"btn btn-primary\" ng-click=\"showNewKey('owner')\" ng-hide=\"newKey['owner']\">Add key</button>\n" +
     "                </div>\n" +
     "              </td>\n" +
     "            </tr>\n" +
@@ -290,8 +299,9 @@ angular.module("list/list.tpl.html", []).run(["$templateCache", function($templa
     "                <div class=\"policy\" ng-repeat=\"policy in policies|filter:{cat: 'others'}\">\n" +
     "                  <div class=\"pull-left\">\n" +
     "                    <img ng-src=\"assets/loading.gif\" ng-show=\"policy.loading\" />\n" +
-    "                    <button class=\"btn btn-sm\" ng-click=\"removeUser(policy.uri, policy.webid)\" ng-hide=\"policy.loading\"><i class=\"fa fa-trash-o orange\"></i></button>\n" +
-    "                    <a href=\"{{policy.webid}}\" target=\"_blank\">{{trunc(policy.fullname, 24)}}</a>\n" +
+    "                    <button class=\"btn btn-sm\" ng-click=\"removePolicy(policy.$$hashKey)\" ng-hide=\"policy.loading\"><i class=\"fa fa-trash-o orange\"></i></button>\n" +
+    "                    <a href=\"{{policy.webid}}\" target=\"_blank\" ng-show=\"policy.webid\">{{trunc(policy.fullname, 24)}}</a>\n" +
+    "                    <div class=\"inline-block\" ng-show=\"policy.key\">Key: {{trunc(policy.fullname, 24)}}</div>\n" +
     "                  </div>\n" +
     "                  <div class=\"boxes pull-right\">\n" +
     "                      <input type=\"checkbox\" ng-model=\"policy.modes.Read\"/><div class=\"mode-label\">Read</div>\n" +
@@ -309,7 +319,15 @@ angular.module("list/list.tpl.html", []).run(["$templateCache", function($templa
     "                    <button class=\"btn btn-sm\" ng-click=\"cancelNewUser('others')\"><i class=\"fa fa-2x fa-times-circle-o\"></i></button>\n" +
     "                    <br/>\n" +
     "                  </div>\n" +
-    "                  <button class=\"btn btn-primary\" ng-click=\"showNewUser('others')\" ng-hide=\"newUser['others']\">Add</button>\n" +
+    "                  <div class=\"policy\" ng-show=\"newKey['others']\">\n" +
+    "                    <input class=\"new-user vmiddle\" type=\"text\" ng-focus=\"isFocused\" ng-model=\"newKey['others'].key\">\n" +
+    "                    <button class=\"btn btn-sm btn-primary\" ng-click=\"generateNewKey(newKey['others'])\" tooltip-placement=\"bottom\" tooltip=\"Generate a random key\"><i class=\"fa fa-2x fa-key\"></i></button>\n" +
+    "                    <button class=\"btn btn-sm btn-primary\" ng-click=\"addNewKey('others', newKey['others'].key)\" ng-disabled=\"newKey['others'].key.length === 0\"><i class=\"fa fa-2x fa-check-circle-o\"></i></button>\n" +
+    "                    <button class=\"btn btn-sm\" ng-click=\"cancelNewKey('others')\"><i class=\"fa fa-2x fa-times-circle-o\"></i></button>\n" +
+    "                    <br/>\n" +
+    "                  </div>\n" +
+    "                  <button class=\"btn btn-primary\" ng-click=\"showNewUser('others')\" ng-hide=\"newUser['others']\">Add user</button>\n" +
+    "                  <button class=\"btn btn-primary\" ng-click=\"showNewKey('others')\" ng-hide=\"newKey['others']\">Add key</button>\n" +
     "                </div>\n" +
     "              </td>\n" +
     "            </tr>\n" +
