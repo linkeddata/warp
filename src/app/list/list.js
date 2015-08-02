@@ -28,7 +28,7 @@ angular.module( 'App.list', [
  */
 .config(function ViewConfig( $stateProvider ) {
   $stateProvider.state( 'list', {
-    url: '/list/{path:.*}',
+    url: '/list/{path:.*}?key',
     views: {
       "main": {
         controller: 'ListCtrl',
@@ -126,8 +126,9 @@ angular.module( 'App.list', [
   };
 
   // TODO: rdflib fetch does not respond properly to 404
-  $scope.listDir = function (url) {
+  $scope.listDir = function (url, key) {
     var elms = url.split("/");
+    elms.splice(-1);
     var schema = '';
     var path = '';
     if (elms[0].substring(0, 4) == 'http') {
@@ -139,15 +140,14 @@ angular.module( 'App.list', [
     $scope.path = schema+'://';
 
     for (i=0; i<elms.length; i++) {
-      if (elms[i].length > 0) {
-        path = (i===0)?elms[0]+'/':path+elms[i]+'/';
-        var dir = {
-          uri: '#/list/'+schema+'/'+path,
-          name: decodeURI(elms[i])
-        };
+      path = (i===0)?elms[0]:path+elms[i];
+      path += '/';
 
-        $scope.breadCrumbs.push(dir);
-      }
+      var dir = {
+        uri: '#/list/'+schema+'/'+path,
+        name: decodeURI(elms[i])
+      };
+      $scope.breadCrumbs.push(dir);
     }
     $scope.path += path;
 
@@ -166,7 +166,7 @@ angular.module( 'App.list', [
     $rdf.Fetcher.crossSiteProxyTemplate=PROXY;
 
     // fetch user data
-    f.nowOrWhenFetched($scope.path,undefined,function(ok, body, xhr) {
+    f.nowOrWhenFetched($scope.path + key,undefined,function(ok, body, xhr) {
       if (!ok) {
         ngProgress.complete();
         $scope.listLocation = false;
@@ -187,6 +187,9 @@ angular.module( 'App.list', [
 
       var dirs = g.statementsMatching(undefined, RDF("type"), POSIX("Directory"));
       for ( var i in dirs ) {
+        if (key.length > 0 && dirs[i].subject.value.indexOf(key) >= 0) {
+          dirs[i].subject.value = dirs[i].subject.value.slice(0, -key.length);
+        }
         var rootURI;
         if (dirs[i].subject.value.indexOf('://') > 0) {
           rootURI = dirs[i].subject.value.split('://')[1].split('/');
@@ -195,11 +198,12 @@ angular.module( 'App.list', [
         }
         var root = (rootURI.length <= 2)?true:false;
         var d = {};
+        var base = '#/list/';
         if ( dirs[i].subject.value == $scope.path ) {
           d = {
             id: $scope.resources.length+1,
             uri: dirs[i].subject.value,
-            path: dirname(document.location.href)+'/',
+            path: base+dirname($stateParams.path)+'/',
             type: '-',
             name: '../',
             mtime: g.any(dirs[i].subject, POSIX("mtime")).value,
@@ -210,7 +214,8 @@ angular.module( 'App.list', [
             d.path = document.location.href;
           }
         } else {
-          var base = (document.location.href.charAt(document.location.href.length - 1) === '/')?document.location.href:document.location.href+'/';
+          // var base = (document.location.href.charAt(document.location.href.length - 1) === '/')?document.location.href:document.location.href+'/';
+          base += $stateParams.path;
           d = {
             id: $scope.resources.length+1,
             uri: dirs[i].subject.value,
@@ -258,7 +263,7 @@ angular.module( 'App.list', [
     dirName = dirName.replace(/^\s+|\s+$/g, "");
     $http({
       method: 'POST',
-      url: $scope.path,
+      url: $scope.path+$scope.key,
       data: '',
       headers: {
         'Content-Type': 'text/turtle',
@@ -294,7 +299,7 @@ angular.module( 'App.list', [
     var uri = $scope.path;
     $http({
       method: 'POST',
-      url: uri,
+      url: uri+$scope.key,
       data: '',
       headers: {
         'Content-Type': 'text/turtle',
@@ -306,8 +311,12 @@ angular.module( 'App.list', [
     success(function(data, status, headers) {
       if (status == 200 || status == 201) {
         // Add resource to the list
-        addResource($scope.resources, uri, 'File');
-        refreshResource($http, $scope.resources, uri);
+        var fileURI = $scope.path+fileName;
+        if (headers('Location')) {
+          fileURI = headers('Location');
+        }
+        addResource($scope.resources, fileURI, 'File');
+        refreshResource($http, $scope.resources, fileURI, $scope.key);
         $scope.emptyDir = false;
         notify('Success', 'Resource created.');
       }
@@ -359,7 +368,7 @@ angular.module( 'App.list', [
   $scope.deleteResource = function(resourceUri) {
     $http({
       method: 'DELETE',
-      url: resourceUri,
+      url: resourceUri+$scope.key,
       withCredentials: true
     }).
     success(function(data, status, headers) {
@@ -371,7 +380,7 @@ angular.module( 'App.list', [
         if (lh['meta'] && lh['meta']['href'].length > 0 && lh['meta']['href'] != resourceUri) {
           $http({
             method: 'DELETE',
-            url: lh['meta']['href'],
+            url: lh['meta']['href']+$scope.key,
             withCredentials: true
           }).
           success(function (data, status) {
@@ -390,7 +399,7 @@ angular.module( 'App.list', [
         if (lh['acl'] && lh['acl']['href'].length > 0 && lh['acl']['href'] != resourceUri) {
           $http({
             method: 'DELETE',
-            url: lh['acl']['href'],
+            url: lh['acl']['href']+$scope.key,
             withCredentials: true
           }).
           success(function (data, status) {
@@ -594,30 +603,36 @@ angular.module( 'App.list', [
 
   // Display list for current path
   if ($stateParams.path.length > 0) {
-    $scope.listDir($stateParams.path);
+    $scope.key = "";
+    if ($stateParams.key && $stateParams.key.length > 0) {
+       $scope.key += '?key='+$stateParams.key;
+    }
+    $scope.listDir($stateParams.path, $scope.key);
   } else {
     $scope.listLocation = false;
   }
 });
 
-var refreshResource = function(http, resources, uri) {
+var refreshResource = function(http, resources, uri, key) {
+  if (!key) {
+    key = '';
+  }
   http({
     method: 'HEAD',
-    url: uri,
+    url: uri+key,
     withCredentials: true
   }).
   success(function(data, status, headers) {
     var l = headers('Content-Length');
-    if (l && l > 0) {
+    if (l && l.length > 0) {
       for(var i = resources.length - 1; i >= 0; i--) {
         if (resources[i].uri == uri) {
           resources[i].size = l;
+          break;
         }
       }
     }
-    return true;
   });
-  return false;
 };
 
 var resourceExists = function (resources, uri) {
@@ -764,13 +779,18 @@ var ModalDeleteCtrl = function ($scope, $modalInstance, uri) {
   };
 };
 
-var ModalUploadCtrl = function ($scope, $modalInstance, $http, $upload, url, resources) {
+var ModalUploadCtrl = function ($scope, $modalInstance, $stateParams, $http, $upload, url, resources) {
   $scope.url = url;
   $scope.resources = resources;
   $scope.container = basename(url);
   $scope.uploading = [];
   $scope.progress = [];
   $scope.filesUploading = 0;
+
+  $scope.key = '';
+  if ($stateParams.key && $stateParams.key.length > 0) {
+    $scope.key += '?key='+$stateParams.key;
+  }
 
   // stop/abort the upload of a file
   $scope.abort = function(index) {
@@ -807,7 +827,7 @@ var ModalUploadCtrl = function ($scope, $modalInstance, $http, $upload, url, res
     $scope.progress[file.name] = 0;
     file.name = file.name.replace(/^\s+|\s+$/g, "");
     $scope.uploading[file.name] = $upload.upload({
-        url: $scope.url,
+        url: $scope.url+$scope.key,
         method: 'POST',
         withCredentials: true,
         file: file
@@ -818,7 +838,7 @@ var ModalUploadCtrl = function ($scope, $modalInstance, $http, $upload, url, res
         // file is uploaded successfully
         $scope.filesUploading--;
         addResource($scope.resources, $scope.url+encodeURI(file.name), 'File', file.size);
-        refreshResource($http, $scope.resources, $scope.url+encodeURI(file.name));
+        refreshResource($http, $scope.resources, $scope.url+encodeURI(file.name), $scope.key);
     });
   };
 
