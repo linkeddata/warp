@@ -175,7 +175,6 @@ angular.module( 'App.list', [
         if (xhr.status === 401 || xhr.status === 403) {
           $scope.noPerm = true;
         }
-        console.log($scope.emptyDir);
         notify('Error', 'Could not fetch dir listing. HTTP '+xhr.status);
       } else {
         $scope.listLocation = true;
@@ -1091,7 +1090,6 @@ var ModalACLEditor = function ($scope, $modalInstance, $http, resources, uri, ac
     var FOAF = $rdf.Namespace("http://xmlns.com/foaf/0.1/");
 
     var g = new $rdf.graph();
-    $scope.uri = encodeURI($scope.uri);
     if ($scope.policies.length > 0) {
       for (var i=0; i<$scope.policies.length;i++) {
         if ($scope.policies[i].cat == 'any' && !$scope.policies[i].modes || (!$scope.policies[i].modes.Read && !$scope.policies[i].modes.Write && !$scope.policies[i].modes.Append)) {
@@ -1118,7 +1116,6 @@ var ModalACLEditor = function ($scope, $modalInstance, $http, resources, uri, ac
       }
     }
     var s = new $rdf.Serializer(g).toN3(g);
-    console.log(s);
     return s;
   };
 

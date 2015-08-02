@@ -262,7 +262,11 @@ angular.module("list/list.tpl.html", []).run(["$templateCache", function($templa
     "                    <img ng-src=\"assets/loading.gif\" ng-show=\"policy.loading\" />\n" +
     "                    <button class=\"btn btn-sm\" ng-click=\"removePolicy(policy.$$hashKey)\" ng-hide=\"policy.loading\"><i class=\"fa fa-trash-o orange\"></i></button>\n" +
     "                    <a href=\"{{policy.webid}}\" target=\"_blank\" ng-show=\"policy.webid\">{{trunc(policy.fullname, 24)}}</a>\n" +
-    "                    <div class=\"inline-block\" ng-show=\"policy.key\">Key: {{trunc(policy.fullname, 24)}}</div>\n" +
+    "                    <div class=\"inline-block\" ng-show=\"policy.key\">\n" +
+    "                      Key: {{trunc(policy.fullname, 24)}}\n" +
+    "                      <a href=\"{{uri}}?key={{policy.key}}\" target=\"_blank\">Link</a>\n" +
+    "                    </div>\n" +
+    "\n" +
     "                  </div>\n" +
     "                  <br>\n" +
     "                </div>\n" +
@@ -301,7 +305,10 @@ angular.module("list/list.tpl.html", []).run(["$templateCache", function($templa
     "                    <img ng-src=\"assets/loading.gif\" ng-show=\"policy.loading\" />\n" +
     "                    <button class=\"btn btn-sm\" ng-click=\"removePolicy(policy.$$hashKey)\" ng-hide=\"policy.loading\"><i class=\"fa fa-trash-o orange\"></i></button>\n" +
     "                    <a href=\"{{policy.webid}}\" target=\"_blank\" ng-show=\"policy.webid\">{{trunc(policy.fullname, 24)}}</a>\n" +
-    "                    <div class=\"inline-block\" ng-show=\"policy.key\">Key: {{trunc(policy.fullname, 24)}}</div>\n" +
+    "                    <div class=\"inline-block\" ng-show=\"policy.key\">\n" +
+    "                      Key: {{trunc(policy.fullname, 24)}}\n" +
+    "                      <a href=\"{{uri}}?key={{policy.key}}\" target=\"_blank\">Link</a>\n" +
+    "                    </div>\n" +
     "                  </div>\n" +
     "                  <div class=\"boxes pull-right\">\n" +
     "                      <input type=\"checkbox\" ng-model=\"policy.modes.Read\"/><div class=\"mode-label\">Read</div>\n" +
