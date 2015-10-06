@@ -187,63 +187,59 @@ angular.module( 'App.list', [
           });
         }
 
-        var dirs = g.statementsMatching(undefined, RDF("type"), LDP("Container"));
-        for ( var i in dirs ) {
-          if (key.length > 0 && dirs[i].subject.value.indexOf(key) >= 0) {
-            dirs[i].subject.value = dirs[i].subject.value.slice(0, -key.length);
-          }
-          var rootURI;
-          if (dirs[i].subject.value.indexOf('://') > 0) {
-            rootURI = dirs[i].subject.value.split('://')[1].split('/');
-          } else {
-            rootURI = dirs[i].subject.value.split('/');
-          }
-          var root = (rootURI.length <= 2)?true:false;
-          var d = {};
-          var base = '#/list/';
-          if ( dirs[i].subject.value == $scope.path ) {
-            d = {
-              id: $scope.resources.length+1,
-              uri: dirs[i].subject.value,
-              path: base+dirname($stateParams.path)+'/',
-              type: '-',
-              name: '../',
-              mtime: g.any(dirs[i].subject, POSIX("mtime")).value,
-              size: '-'
-            };
-            if (root) {
-              d.name = '/';
-              d.path = document.location.href;
+        // Build list of dirs and files
+        var files = g.statementsMatching(undefined, LDP("contains"), undefined);
+        var dirs = [];
+        for (var i=files.length-1; i>=0; i--) {
+            if (g.statementsMatching(files[i].object, RDF("type"), LDP("Container")).length > 0) {
+              dirs.push(files[i]);
+              files.splice(i,1);
             }
-          } else {
-            // var base = (document.location.href.charAt(document.location.href.length - 1) === '/')?document.location.href:document.location.href+'/';
-            base += $stateParams.path;
-            d = {
-              id: $scope.resources.length+1,
-              uri: dirs[i].subject.value,
-              path: base+(basename(dirs[i].subject.value))+'/',
-              type: 'Directory',
-              name: decodeURI(basename(dirs[i].subject.value).replace("+", "%20")),
-              mtime: g.any(dirs[i].subject, POSIX("mtime")).value,
-              size: '-'
-            };
+        }
+
+        // add root
+        var base = '#/list/';
+        // base += $stateParams.path;
+        var rootURI = $scope.path.split('://')[1].split('/')[0];
+        var d = {
+          id: $scope.resources.length+1,
+          uri: $stateParams.path,
+          path: base+dirname($stateParams.path)+'/',
+          type: '-',
+          name: '../',
+          mtime: g.any($rdf.sym($scope.path), POSIX("mtime")).value,
+          size: '-'
+        };
+        if (d.path == base+schema+'/') {
+          d.name = '/';
+          d.path = document.location.href;
+        }
+        $scope.resources.push(d);
+
+        for (i in dirs) {
+          if (key.length > 0 && dirs[i].object.value.indexOf(key) >= 0) {
+            dirs[i].object.value = dirs[i].object.value.slice(0, -key.length);
           }
+          d = {
+            id: $scope.resources.length+1,
+            uri: dirs[i].object.value,
+            path: base+$stateParams.path+(basename(dirs[i].object.value))+'/',
+            type: 'Directory',
+            name: decodeURI(basename(dirs[i].object.value).replace("+", "%20")),
+            mtime: g.any(dirs[i].object, POSIX("mtime")).value,
+            size: '-'
+          };
           $scope.resources.push(d);
         }
-        // either POSIX:File or RDFS:Resource
-        // TODO: remove duplicates using something like http://lodash.com/docs#union
-        // var files = g.statementsMatching(undefined, RDF("type"), POSIX("File"));
-        var files = g.statementsMatching(undefined, RDF("type"), LDP("Resource"));
-        // files = (files.length > 0)?files.concat(g.statementsMatching($scope.path, LDP("contains"), undefined)):g.statementsMatching(undefined, RDF("type"), RDFS("Resource"));
         for (i in files) {
           var f = {
             id: $scope.resources.length+1,
-            uri: files[i].subject.value,
-            path: files[i].subject.value,
+            uri: files[i].object.value,
+            path: files[i].object.value,
             type: 'File', // TODO: use the real type
-            name: decodeURI(basename(files[i].subject.value).replace("+", "%20")),
-            mtime: g.any(files[i].subject, POSIX("mtime")).value,
-            size: g.any(files[i].subject, POSIX("size")).value
+            name: decodeURI(basename(files[i].object.value).replace("+", "%20")),
+            mtime: g.any(files[i].object, POSIX("mtime")).value,
+            size: g.any(files[i].object, POSIX("size")).value
           };
           $scope.resources.push(f);
           $scope.$apply();
