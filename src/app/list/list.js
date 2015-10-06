@@ -187,7 +187,7 @@ angular.module( 'App.list', [
           });
         }
 
-        var dirs = g.statementsMatching(undefined, RDF("type"), POSIX("Directory"));
+        var dirs = g.statementsMatching(undefined, RDF("type"), LDP("Container"));
         for ( var i in dirs ) {
           if (key.length > 0 && dirs[i].subject.value.indexOf(key) >= 0) {
             dirs[i].subject.value = dirs[i].subject.value.slice(0, -key.length);
@@ -232,7 +232,8 @@ angular.module( 'App.list', [
         }
         // either POSIX:File or RDFS:Resource
         // TODO: remove duplicates using something like http://lodash.com/docs#union
-        var files = g.statementsMatching(undefined, RDF("type"), POSIX("File"));
+        // var files = g.statementsMatching(undefined, RDF("type"), POSIX("File"));
+        var files = g.statementsMatching(undefined, RDF("type"), LDP("Resource"));
         // files = (files.length > 0)?files.concat(g.statementsMatching($scope.path, LDP("contains"), undefined)):g.statementsMatching(undefined, RDF("type"), RDFS("Resource"));
         for (i in files) {
           var f = {
