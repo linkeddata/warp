@@ -531,6 +531,10 @@ angular.module( 'App.list', [
       // add dir to local list
       var lh = parseLinkHeader(headers('Link'));
       var aclURI = (lh['acl'] && lh['acl']['href'].length > 0)?lh['acl']['href']:'';
+      // check for relative URIs
+      if (aclURI && aclURI.slice(0,4) != 'http') {
+        aclURI = uri+aclURI;
+      }
 
       var checkACLfile = function(data, status, headers) {
         if (status === 200 || status === 404) {
