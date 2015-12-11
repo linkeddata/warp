@@ -130,20 +130,22 @@ angular.module( 'App.list', [
   // TODO: rdflib fetch does not respond properly to 404
   $scope.listDir = function (url, key) {
     var elms = url.split("/");
-    elms.splice(-1);
+    // elms = elms.splice(-1);
     var schema = '';
     var path = '';
-    if (elms[0].substring(0, 4) == 'http') {
+    if (elms[0].substring(0, 5) == 'https') {
       schema = elms[0];
-      elms.splice(0,1);
+      // elms = elms.splice(0,1);
     } else {
-      schema = 'https';
+      schema = 'http';
     }
     $scope.path = schema+'://';
 
-    for (i=0; i<elms.length; i++) {
+    for (i=1; i<elms.length; i++) {
       path = (i===0)?elms[0]:path+elms[i];
-      path += '/';
+      if (path.lastIndexOf('/') != path.length-1) {
+        path += '/';
+      }
 
       var dir = {
         uri: '#/list/'+schema+'/'+path,
@@ -177,6 +179,14 @@ angular.module( 'App.list', [
         }
         notify('Error', 'Could not fetch dir listing. HTTP '+xhr.status);
       } else {
+        // append trailing slash if we had a redirect
+        if (xhr && xhr.requestedURI && xhr.requestedURI.lastIndexOf('/') == xhr.requestedURI.length-1) {
+          if ($stateParams.path.lastIndexOf('/') != $stateParams.path.length-1) {
+            $stateParams.path += '/';
+            // $scope.path += '/';
+          }
+        }
+
         $scope.listLocation = true;
 
         $scope.userProfile = {};
@@ -203,7 +213,7 @@ angular.module( 'App.list', [
         var rootURI = $scope.path.split('://')[1].split('/')[0];
         var d = {
           id: $scope.resources.length+1,
-          uri: $stateParams.path,
+          uri: $scope.path,
           path: base+dirname($stateParams.path)+'/',
           type: '-',
           name: '../',
@@ -517,47 +527,13 @@ angular.module( 'App.list', [
   };
   // ACL dialog
   $scope.openACLEditor = function (resources, uri, type) {
-    // Find ACL uri and check if we can modify it
-    $http({
-      method: 'HEAD',
-      url: uri,
-      withCredentials: true
-    }).
-    success(function(data, status, headers) {
+    var findACLURL = function(data, status, headers) {
       // add dir to local list
       var lh = parseLinkHeader(headers('Link'));
       var aclURI = (lh['acl'] && lh['acl']['href'].length > 0)?lh['acl']['href']:'';
 
-      $http({
-        method: 'HEAD',
-        url: aclURI,
-        withCredentials: true
-      }).
-      success(function(data, status, headers) {
-        var modalInstance = $modal.open({
-          templateUrl: 'acleditor.html',
-          controller: ModalACLEditor,
-          resolve: {
-            resources: function () {
-              return resources;
-            },
-            uri: function () {
-              return uri;
-            },
-            aclURI: function () {
-              return aclURI;
-            },
-            type: function() {
-              return type;
-            },
-            exists: function() {
-              return true;
-            }
-          }
-        });
-      }).
-      error(function(data, status) {
-        if (status == 404) {
+      var checkACLfile = function(data, status, headers) {
+        if (status === 200 || status === 404) {
           // missing ACL file is OK
           var modalInstance = $modal.open({
             templateUrl: 'acleditor.html',
@@ -576,28 +552,32 @@ angular.module( 'App.list', [
                 return type;
               },
               exists: function() {
-                return false;
+                return (status === 200)?true:false;
               }
             }
           });
-        } else if (status == 401) {
+        } else if (status === 401) {
           notify('Forbidden', 'Authentication required to change permissions for: '+decodeURI(basename(uri)));
-        } else if (status == 403) {
+        } else if (status === 403) {
           notify('Forbidden', 'You are not allowed to change permissions for: '+decodeURI(basename(uri)));
         } else {
           notify('Failed - HTTP '+status, data, 5000);
         }
-      });
-    }).
-    error(function(data, status) {
-      if (status == 401) {
-        notify('Forbidden', 'Authentication required to change permissions for: '+decodeURI(basename(uri)));
-      } else if (status == 403) {
-        notify('Forbidden', 'You are not allowed to change permissions for: '+decodeURI(basename(uri)));
-      } else {
-        notify('Failed - HTTP '+status, data, 5000);
-      }
-    });
+      };
+
+      $http({
+        method: 'HEAD',
+        url: aclURI,
+        withCredentials: true
+      }).
+      success(checkACLfile).error(checkACLfile);
+    };
+    // Find ACL uri and check if we can modify it
+    $http({
+      method: 'HEAD',
+      url: uri,
+      withCredentials: true
+    }).success(findACLURL).error(findACLURL);
   };
 
   // Display list for current path
