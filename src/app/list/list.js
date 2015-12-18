@@ -204,7 +204,9 @@ angular.module( 'App.list', [
         var files = g.statementsMatching(undefined, LDP("contains"), undefined);
         var dirs = [];
         for (var i=files.length-1; i>=0; i--) {
-            if (g.statementsMatching(files[i].object, RDF("type"), LDP("Container")).length > 0) {
+            if (g.statementsMatching(files[i].object, RDF("type"), LDP("Container")).length > 0 ||
+              g.statementsMatching(files[i].object, RDF("type"), LDP("BasicContainer")).length > 0 ||
+              g.statementsMatching(files[i].object, RDF("type"), POSIX("Directory")).length > 0) {
               dirs.push(files[i]);
               files.splice(i,1);
             }
@@ -1156,7 +1158,6 @@ var ModalACLEditor = function ($scope, $modalInstance, $http, resources, uri, ac
       }
     };
 
-    console.log("sendNotification", policy);
     var g = new $rdf.graph();
     var me = $rdf.sym(policy.webid);
     var body = 'You have been given '+listModes(policy.modes)+' access to '+$scope.uri+'.';
@@ -1167,7 +1168,7 @@ var ModalACLEditor = function ($scope, $modalInstance, $http, resources, uri, ac
     g.add($rdf.sym(''), SIOC('has_creator'), $rdf.sym('#author'));
 
     g.add($rdf.sym('#author'), RDF('type'), SIOC('UserAccount'));
-    g.add($rdf.sym('#author'), SIOC('account_of'), $rdf.sym(policy.webid));
+    g.add($rdf.sym('#author'), SIOC('account_of'), $rdf.sym(userProfile.webid));
     if (userProfile.fullname) {
       g.add($rdf.sym('#author'), FOAF('name'), $rdf.lit(userProfile.fullname));
     }
