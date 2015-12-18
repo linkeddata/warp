@@ -89,7 +89,9 @@ var getProfile = function(scope, uri, profile, forWebID) {
           profile.picture = pic;
         }
         if (!profile.inbox || profile.inbox.length === 0) {
-          profile.inbox = inbox.uri;
+          if (inbox) {
+            profile.inbox = inbox.uri;
+          }
         }
         profile.loading = false;
         scope.$apply();
