@@ -163,6 +163,9 @@ angular.module( 'App.list', [
     var RDFS = $rdf.Namespace("http://www.w3.org/2000/01/rdf-schema#");
     var LDP = $rdf.Namespace("http://www.w3.org/ns/ldp#");
     var POSIX = $rdf.Namespace("http://www.w3.org/ns/posix/stat#");
+    var DCT = $rdf.Namespace("http://purl.org/dc/terms/");
+    var SIOC = $rdf.Namespace("http://rdfs.org/sioc/ns#");
+    var SOLID = $rdf.Namespace("http://www.w3.org/ns/solid/terms#");
 
     var g = $rdf.graph();
     var f = $rdf.fetcher(g, TIMEOUT);
@@ -865,6 +868,10 @@ var ModalACLEditor = function ($scope, $modalInstance, $http, resources, uri, ac
   var RDFS = $rdf.Namespace("http://www.w3.org/2000/01/rdf-schema#");
   var WAC = $rdf.Namespace("http://www.w3.org/ns/auth/acl#");
   var FOAF = $rdf.Namespace("http://xmlns.com/foaf/0.1/");
+  var DCT = $rdf.Namespace("http://purl.org/dc/terms/");
+  var LDP = $rdf.Namespace("http://www.w3.org/ns/ldp#");
+  var SIOC = $rdf.Namespace("http://rdfs.org/sioc/ns#");
+  var SOLID = $rdf.Namespace("http://www.w3.org/ns/solid/terms#");
 
   var g = $rdf.graph();
 
@@ -923,6 +930,7 @@ var ModalACLEditor = function ($scope, $modalInstance, $http, resources, uri, ac
     getProfile($scope, webid, user).then(function(profile){
       user.loading = false;
     });
+    user.isNew = true;
     $scope.policies.push(user);
 
     $scope.newUser[cat] = undefined;
@@ -1119,11 +1127,67 @@ var ModalACLEditor = function ($scope, $modalInstance, $http, resources, uri, ac
       }
       refreshResource($http, $scope.resources, $scope.aclURI);
       $scope.disableOk = false;
+
+      // Send notifications to each user's inbox (if they have one)
+      for (var i=0; i<$scope.policies.length; i++) {
+        var p = $scope.policies[i];
+        if (p.inbox && p.isNew && p.webid != userProfile.webid) {
+          $scope.sendNotification(p);
+        }
+      }
       notify('Success', 'Updated ACL policies for: '+basename($scope.uri));
     }).
     error(function(data, status, headers) {
       $scope.disableOk = false;
       notify('Error - '+status, data);
+    });
+  };
+
+  $scope.sendNotification = function(policy) {
+    var listModes = function(modes) {
+      if (modes) {
+        var ret = [];
+        Object.keys(modes).forEach(function(m) {
+          if (m) {
+            ret.push(m.toLowerCase());
+          }
+        });
+        return ret.join(', ');
+      }
+    };
+
+    console.log("sendNotification", policy);
+    var g = new $rdf.graph();
+    var me = $rdf.sym(policy.webid);
+    var body = 'You have been given '+listModes(policy.modes)+' access to '+$scope.uri+'.';
+    g.add($rdf.sym(''), RDF('type'), SOLID('Notification'));
+    g.add($rdf.sym(''), DCT('title'), $rdf.lit('Shared resource'));
+    g.add($rdf.sym(''), DCT('created'), $rdf.lit(new Date().toISOString(), '', $rdf.Symbol.prototype.XSDdateTime));
+    g.add($rdf.sym(''), SIOC('content'), $rdf.lit(body));
+    g.add($rdf.sym(''), SIOC('has_creator'), $rdf.sym('#author'));
+
+    g.add($rdf.sym('#author'), RDF('type'), SIOC('UserAccount'));
+    g.add($rdf.sym('#author'), SIOC('account_of'), $rdf.sym(policy.webid));
+    if (userProfile.fullname) {
+      g.add($rdf.sym('#author'), FOAF('name'), $rdf.lit(userProfile.fullname));
+    }
+    if (userProfile.picture) {
+      g.add($rdf.sym('#author'), SIOC('avatar'), $rdf.sym(userProfile.picture));
+    }
+
+    var data = new $rdf.Serializer(g).toN3(g);
+    $http({
+      method: 'POST',
+      url: policy.inbox,
+      withCredentials: true,
+      headers: {
+        "Content-Type": "text/turtle",
+        "Link": '<'+LDP('Resource').uri+'>; rel="type"'
+      },
+      data: data
+    }).
+    success(function() {
+      console.log("Notification sent to "+policy.inbox);
     });
   };
 

@@ -3,6 +3,7 @@ var getProfile = function(scope, uri, profile, forWebID) {
   var FOAF = $rdf.Namespace("http://xmlns.com/foaf/0.1/");
   var OWL = $rdf.Namespace("http://www.w3.org/2002/07/owl#");
   var SPACE = $rdf.Namespace("http://www.w3.org/ns/pim/space#");
+  var SOLID = $rdf.Namespace("http://www.w3.org/ns/solid/terms#");
 
   var g = $rdf.graph();
   var f = $rdf.fetcher(g, TIMEOUT);
@@ -74,6 +75,9 @@ var getProfile = function(scope, uri, profile, forWebID) {
             pic = '';
           }
         }
+        // get inbox
+        var inbox = g.any(webidRes, SOLID('inbox'));
+        // set values
         profile.webid = webid;
         if (!profile.predicate || profile.predicate.length === 0) {
           profile.predicate = classType;
@@ -83,6 +87,9 @@ var getProfile = function(scope, uri, profile, forWebID) {
         }
         if (!profile.picture || profile.picture.length === 0) {
           profile.picture = pic;
+        }
+        if (!profile.inbox || profile.inbox.length === 0) {
+          profile.inbox = inbox.uri;
         }
         profile.loading = false;
         scope.$apply();
