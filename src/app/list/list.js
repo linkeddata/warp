@@ -1162,7 +1162,7 @@ var ModalACLEditor = function ($scope, $modalInstance, $http, resources, uri, ac
     var me = $rdf.sym(policy.webid);
     var body = 'You have been given '+listModes(policy.modes)+' access to '+$scope.uri+'.';
     g.add($rdf.sym(''), RDF('type'), SOLID('Notification'));
-    g.add($rdf.sym(''), DCT('title'), $rdf.lit('Has shared something with you'));
+    g.add($rdf.sym(''), DCT('title'), $rdf.lit('File share activity'));
     g.add($rdf.sym(''), DCT('created'), $rdf.lit(new Date().toISOString(), '', $rdf.Symbol.prototype.XSDdateTime));
     g.add($rdf.sym(''), SIOC('content'), $rdf.lit(body));
     g.add($rdf.sym(''), SIOC('has_creator'), $rdf.sym('#author'));
