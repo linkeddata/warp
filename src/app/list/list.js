@@ -535,14 +535,11 @@ angular.module( 'App.list', [
     var findACLURL = function(data, status, headers) {
       // add dir to local list
       var lh = parseLinkHeader(headers('Link'));
-      console.log(lh);
       var aclURI = (lh['acl'] && lh['acl']['href'].length > 0)?lh['acl']['href']:'';
-      console.log("ACL URI:", aclURI);
       // check for relative URIs
       if (aclURI && aclURI.slice(0,4) != 'http') {
         aclURI = uri.slice(0, uri.lastIndexOf('/') + 1)+aclURI;
       }
-      console.log("Final ACL URI:", aclURI);
 
       var checkACLfile = function(data, status, headers) {
         if (status === 200 || status === 404) {
@@ -997,7 +994,6 @@ var ModalACLEditor = function ($scope, $modalInstance, $http, resources, uri, ac
 
       getPolicies = function(triples, cat, arr) {
         if (triples !== undefined && triples.length > 0) {
-          console.log(triples);
           for (i=0; i<triples.length;i++) {
             var policy = {};
             policy.uri = triples[i].subject.uri;
@@ -1086,7 +1082,6 @@ var ModalACLEditor = function ($scope, $modalInstance, $http, resources, uri, ac
 
     var g = new $rdf.graph();
     if ($scope.policies.length > 0) {
-      console.log($scope.policies);
       for (var i=0; i<$scope.policies.length;i++) {
         if ($scope.policies[i].cat == 'any' && !$scope.policies[i].modes || (!$scope.policies[i].modes.Read && !$scope.policies[i].modes.Write && !$scope.policies[i].modes.Append)) {
           continue;
@@ -1119,7 +1114,6 @@ var ModalACLEditor = function ($scope, $modalInstance, $http, resources, uri, ac
       }
     }
     var s = new $rdf.Serializer(g).toN3(g);
-    console.log("writing:", s);
     return s;
   };
 
