@@ -286,12 +286,12 @@ angular.module( 'App.list', [
       },
       withCredentials: true
     }).
-    success(function(data, status) {
+    success(function(data, status, headers) {
       if (status == 200 || status == 201) {
         // add dir to local list
         var now = new Date().getTime();
         var base = (document.location.href.charAt(document.location.href.length - 1) === '/')?document.location.href:document.location.href+'/';
-        addResource($scope.resources, $scope.path+dirName, 'Directory');
+        addResource($scope.resources, headers('Location'), 'Directory');
         $scope.emptyDir = false;
         notify('Success', 'Directory created.');
       }
