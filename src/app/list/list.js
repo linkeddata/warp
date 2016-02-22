@@ -291,7 +291,14 @@ angular.module( 'App.list', [
         // add dir to local list
         var now = new Date().getTime();
         var base = (document.location.href.charAt(document.location.href.length - 1) === '/')?document.location.href:document.location.href+'/';
-        addResource($scope.resources, headers('Location'), 'Directory');
+        var newURI = $scope.path+dirName;
+        if (headers('Location')) {
+          newURI = headers('Location');
+          if (newURI && newURI.slice(0,4) != 'http') {
+            newURI = $scope.path.slice(0, $scope.path.lastIndexOf('/') + 1)+newURI;
+          }
+        }
+        addResource($scope.resources, newURI, 'Directory');
         $scope.emptyDir = false;
         notify('Success', 'Directory created.');
       }
@@ -325,12 +332,15 @@ angular.module( 'App.list', [
     success(function(data, status, headers) {
       if (status == 200 || status == 201) {
         // Add resource to the list
-        var fileURI = $scope.path+fileName;
+        var newURI = $scope.path+fileName;
         if (headers('Location')) {
-          fileURI = headers('Location');
+          newURI = headers('Location');
+          if (newURI && newURI.slice(0,4) != 'http') {
+            newURI = uri.slice(0, uri.lastIndexOf('/'))+newURI;
+          }
         }
-        addResource($scope.resources, fileURI, 'File');
-        refreshResource($http, $scope.resources, fileURI, $scope.key);
+        addResource($scope.resources, newURI, 'File');
+        refreshResource($http, $scope.resources, newURI, $scope.key);
         $scope.emptyDir = false;
         notify('Success', 'Resource created.');
       }
