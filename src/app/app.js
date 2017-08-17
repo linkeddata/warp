@@ -1,6 +1,6 @@
 // Globals
-var PROXY = "https://databox.me/proxy?uri={uri}";
-var AUTH_PROXY = "https://databox.me/proxy?uri={uri}";
+var PROXY = "https://databox.me/,proxy?uri={uri}";
+var AUTH_PROXY = "https://databox.me/,proxy?uri={uri}";
 var TIMEOUT = 90000;
 var DEBUG = true;
 
