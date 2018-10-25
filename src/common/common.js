@@ -3,7 +3,7 @@ var getProfile = function(scope, uri, profile, forWebID) {
   var FOAF = $rdf.Namespace("http://xmlns.com/foaf/0.1/");
   var OWL = $rdf.Namespace("http://www.w3.org/2002/07/owl#");
   var SPACE = $rdf.Namespace("http://www.w3.org/ns/pim/space#");
-  var SOLID = $rdf.Namespace("http://www.w3.org/ns/solid/terms#");
+  var LDP = $rdf.Namespace("http://www.w3.org/ns/ldp#");
 
   var g = $rdf.graph();
   var f = $rdf.fetcher(g, TIMEOUT);
@@ -76,7 +76,7 @@ var getProfile = function(scope, uri, profile, forWebID) {
           }
         }
         // get inbox
-        var inbox = g.any(webidRes, SOLID('inbox'));
+        var inbox = g.any(webidRes, LDP('inbox'));
         // set values
         profile.webid = webid;
         if (!profile.predicate || profile.predicate.length === 0) {
